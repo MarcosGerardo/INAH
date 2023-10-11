@@ -9,35 +9,33 @@ package FRAMES;
  * @author matam
  */
 import java.awt.Color;
-import java.awt.List;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 public class FramePrincipal extends javax.swing.JFrame {
 
-    /**
-     * Creates new form FramePrincipal
-     */
+ 
+
     public FramePrincipal() {
         initComponents();
          JOptionPane.showMessageDialog(null, "CONEXIÓN ESTABLECIDA BIENVENIDO");
       this.setTitle("Automatización y Modernización de Procesos en la Sección de Arqueología del Centro INAH Durango");
         this.setLocationRelativeTo(null);
+        
           //cargarDatosDesdeTabla();
        llenarCamposDesdeTabla();
         mostrar("sitios");
         mostrarEstructura("estructuras");
         Autocompleter(ComboBoxCarta);
         AutocompleterTwo(ComboBoxCarta1);
-        obtenerIdSitioPorNombre();
-      
+        cargarSitios();
+       
        // AutoCompleteDecorator.decorate(ComboBoxCarta);
     }
     public void Autocompleter(JComboBox txtCarta){
@@ -126,7 +124,8 @@ private void Insertar(String nombre, String descripcion, String referencia, Stri
         }
     }
 }
-private String obtenerIdSitioPorNombre() {
+
+private void cargarSitios() {
     Connection conn = null;
     CONECTOR cn = new CONECTOR();
     PreparedStatement ps = null;
@@ -134,38 +133,21 @@ private String obtenerIdSitioPorNombre() {
 
     try {
         conn = cn.getConexion();
-
         // Consulta SQL para obtener los nombres de todos los sitios
-        String sql = "SELECT nombre FROM SITIOS";
+        String sql = "SELECT id, nombre FROM SITIOS";
         ps = conn.prepareStatement(sql);
         rs = ps.executeQuery();
 
-        // Limpiar el ComboBox antes de cargar los nombres
+        // Limpiar el JComboBox antes de cargar los nombres
         ComboBoxE.removeAllItems();
 
         while (rs.next()) {
             String nombreSitio = rs.getString("nombre");
             ComboBoxE.addItem(nombreSitio);
         }
-
-        // Verificar si hay un elemento seleccionado en el ComboBox
-        if (ComboBoxE.getSelectedItem() != null) {
-            // Obtener el nombre del sitio seleccionado en el ComboBox
-            String nombreSitioSeleccionado = ComboBoxE.getSelectedItem().toString();
-
-            // Consulta SQL para obtener el ID del sitio seleccionado por su nombre
-            String sqlIdSitio = "SELECT id FROM SITIOS WHERE nombre = ?";
-            ps = conn.prepareStatement(sqlIdSitio);
-            ps.setString(1, nombreSitioSeleccionado);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("id");
-            }
-        }
     } catch (SQLException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error al obtener el ID del sitio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Error al cargar los sitios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     } finally {
         // Cerrar la conexión y los recursos
         try {
@@ -182,50 +164,42 @@ private String obtenerIdSitioPorNombre() {
             e.printStackTrace();
         }
     }
-
-    return null;
 }
 
-
-
-
-// Método para registrar una estructura
 private void registrarEstructura() {
-    
     Connection conn = null;
     CONECTOR cn = new CONECTOR();
     PreparedStatement ps = null;
-    ResultSet rs;
+    ResultSet rs = null;
 
     try {
         conn = cn.getConexion();
-        String sql = "INSERT INTO sitios (nombre, descripcion, referencia, coordenadas, Carta) VALUES (?, ?, ?, ?)";
-        String elementoSeleccionado = ComboBoxE.getSelectedItem().toString();
-        // Obtén los valores de los campos de texto u otras fuentes
+        String sql = "INSERT INTO estructuras (nombre, descripcion, referencia, sitio_id) VALUES (?, ?, ?, (SELECT id FROM SITIOS WHERE nombre = ?))";
+
+        // Obtén los valores de los campos de texto
         String nombre = txtNombreE.getText();
         String descripcion = txtDescripcionE.getText();
         String referencia = txtReferenciaE.getText();
-      
-        
+        String nombreSitioSeleccionado = ComboBoxE.getSelectedItem().toString();
 
         ps = conn.prepareStatement(sql);
         ps.setString(1, nombre);
         ps.setString(2, descripcion);
         ps.setString(3, referencia);
-        ps.setString(4, elementoSeleccionado);
-   
+        ps.setString(4, nombreSitioSeleccionado);
 
         int filasAfectadas = ps.executeUpdate();
         if (filasAfectadas > 0) {
-          JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);;
+            JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } else {
             System.out.println("No se pudieron insertar los datos.");
             JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     } catch (SQLException e) {
-        System.out.print(e.toString());
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al registrar la estructura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     } finally {
-        // Cerrar la conexión y el PreparedStatement
+        // Cerrar la conexión y los recursos
         try {
             if (ps != null) {
                 ps.close();
@@ -234,16 +208,10 @@ private void registrarEstructura() {
                 conn.close();
             }
         } catch (SQLException e) {
-            System.out.print(e);
+            e.printStackTrace();
         }
     }
 }
-
-
-
-
-
-
 
 
 
@@ -1237,7 +1205,7 @@ btnRegistrar.setToolTipText("REGISTRAR NUEVO SITIO");
         // Aquí llama a la función para insertar datos en la base de datos
         Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
          mostrar("sitios");
-           obtenerIdSitioPorNombre();
+          
         // TODO add your handling code here:
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
@@ -1349,8 +1317,10 @@ btnLimpiar.setBackground(new Color(96,219,164 ));
     }//GEN-LAST:event_btnRegistrar1MouseExited
 
     private void btnRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrar1ActionPerformed
-registrarEstructura();
-     //   mostrarEstructura(visorEstructuras);
+registrarEstructura(); 
+cargarSitios();
+
+       
      
 
 
