@@ -35,6 +35,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         Autocompleter(ComboBoxCarta);
         AutocompleterTwo(ComboBoxCarta1);
         cargarSitios();
+        ComboBoxE.setSelectedItem(null);
        
        // AutoCompleteDecorator.decorate(ComboBoxCarta);
     }
@@ -134,7 +135,7 @@ private void cargarSitios() {
     try {
         conn = cn.getConexion();
         // Consulta SQL para obtener los nombres de todos los sitios
-        String sql = "SELECT id, nombre FROM SITIOS";
+        String sql = "SELECT id, nombre FROM SITIOS ";
         ps = conn.prepareStatement(sql);
         rs = ps.executeQuery();
 
@@ -174,26 +175,31 @@ private void registrarEstructura() {
 
     try {
         conn = cn.getConexion();
-        String sql = "INSERT INTO estructuras (nombre, descripcion, referencia, sitio_id) VALUES (?, ?, ?, (SELECT id FROM SITIOS WHERE nombre = ?))";
-
+        
         // Obtén los valores de los campos de texto
         String nombre = txtNombreE.getText();
         String descripcion = txtDescripcionE.getText();
         String referencia = txtReferenciaE.getText();
-        String nombreSitioSeleccionado = ComboBoxE.getSelectedItem().toString();
+        String nombreSitioSeleccionado =  ComboBoxE.getSelectedItem().toString();
 
-        ps = conn.prepareStatement(sql);
-        ps.setString(1, nombre);
-        ps.setString(2, descripcion);
-        ps.setString(3, referencia);
-        ps.setString(4, nombreSitioSeleccionado);
+        if (!nombreSitioSeleccionado.isEmpty()) {
+            String sql = "INSERT INTO estructuras (nombre, descripcion, referencia, sitio_id) VALUES (?, ?, ?, (SELECT id FROM SITIOS WHERE nombre = ?))";
 
-        int filasAfectadas = ps.executeUpdate();
-        if (filasAfectadas > 0) {
-            JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, descripcion);
+            ps.setString(3, referencia);
+            ps.setString(4, nombreSitioSeleccionado);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudieron insertar los datos.");
+                JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
-            System.out.println("No se pudieron insertar los datos.");
-            JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione un sitio antes de registrar la estructura.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -212,6 +218,9 @@ private void registrarEstructura() {
         }
     }
 }
+
+
+
 
 
 
