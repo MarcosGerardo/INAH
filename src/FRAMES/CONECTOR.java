@@ -12,7 +12,7 @@ public class CONECTOR {
 
     public static final String URL = "jdbc:mysql://localhost:3306/inah";
     public static final String USER = "root";
-    public static final String CLAVE = "";
+    public static final String CLAVE = "root";
 
     public Connection getConexion() {
         Connection con = null;

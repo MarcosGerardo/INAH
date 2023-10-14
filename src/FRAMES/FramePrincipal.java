@@ -24,21 +24,466 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     public FramePrincipal() {
         initComponents();
-         JOptionPane.showMessageDialog(null, "CONEXIÓN ESTABLECIDA BIENVENIDO");
+      JOptionPane.showMessageDialog(null, "CONEXIÓN ESTABLECIDA BIENVENIDO");
       this.setTitle("Automatización y Modernización de Procesos en la Sección de Arqueología del Centro INAH Durango");
         this.setLocationRelativeTo(null);
-        
-          //cargarDatosDesdeTabla();
-       llenarCamposDesdeTabla();
+        llenarCamposDesdeTabla();
         mostrar("sitios");
         mostrarEstructura("estructuras");
         Autocompleter(ComboBoxCarta);
         AutocompleterTwo(ComboBoxCarta1);
         cargarSitios();
-        ComboBoxE.setSelectedItem(null);
-       
-       // AutoCompleteDecorator.decorate(ComboBoxCarta);
     }
+    //METODOSSITIOS
+    //METODOPARAREGISTRAR UN NUEVO SITIO
+    private void Insertar(String nombre, String descripcion, String referencia, String coordenadas, String carta, String tipo) {
+    Connection conn = null;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps = null;
+    try {
+        conn = cn.getConexion();
+        String sql = "INSERT INTO sitios (nombre, descripcion, referencia, coordenadas, CartaTopografica , tipo) VALUES (?, ?, ?, ?, ?, ?)";
+        String elementoSeleccionado = ComboBoxCarta.getSelectedItem().toString();
+            String elementoSeleccionado1 = ComboBoxCarta1.getSelectedItem().toString();
+        ps = conn.prepareStatement(sql);
+        ps.setString(1, nombre);
+        ps.setString(2, descripcion);
+        ps.setString(3, referencia);
+        ps.setString(4, coordenadas);
+        ps.setString(5, elementoSeleccionado);
+        ps.setString(6, elementoSeleccionado1);
+        int filasAfectadas = ps.executeUpdate();
+        if (filasAfectadas > 0) {
+          JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);;
+        } else {
+            System.out.println("No se pudieron insertar los datos.");
+            JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        System.out.print(e.toString());
+    } finally {
+        // Cerrar la conexión y el PreparedStatement
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            System.out.print(e);
+        }
+    }
+}
+ // Consulta SQL para obtener los nombres de todos los sitios
+    private void cargarSitios() {
+    Connection conn = null;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+        conn = cn.getConexion();
+        String sql = "SELECT id, nombre FROM SITIOS ";
+        ps = conn.prepareStatement(sql);
+        rs = ps.executeQuery();
+        // Limpiar el JComboBox antes de cargar los nombres
+        ComboBoxE.removeAllItems();
+        while (rs.next()) {
+            String nombreSitio = rs.getString("nombre");
+            ComboBoxE.addItem(nombreSitio);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al cargar los sitios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        // Cerrar la conexión y los recursos
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+ public void insertarDesdeTextField(JTextField txtNombre, JTextField txtDescripcion, JTextField txtReferencia,  JTextField txtCoordenadas, JComboBox ComboBoxCarta,  JComboBox ComboBoxCarta1) {
+        String nombre = txtNombre.getText();
+        String descripcion = txtDescripcion.getText();
+        String referencia = txtReferencia.getText();
+        String coordenadas = txtCoordenadas.getText();
+        String carta = ComboBoxCarta.getSelectedItem().toString();
+        String tipo =  ComboBoxCarta1.getSelectedItem().toString();
+        Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
+    }
+ public void cargarDatosDesdeTabla() {
+  Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    try {
+      CONECTOR con=new CONECTOR();
+        conn = con.getConexion();
+        String sql = "SELECT * FROM sitios";
+        stmt = conn.prepareStatement(sql);
+        rs = stmt.executeQuery();
+        if (rs.next()) {
+            String nombre = rs.getString("nombre");
+            String descripcion = rs.getString("descripcion");
+            String referencia = rs.getString("referencia");
+            String coordenadas = rs.getString("coordenadas");
+            String cartaTopografica = rs.getString("CartaTopografica");
+            String tipo = rs.getString("tipo");
+            txtNombre.setText(nombre);
+            txtDescripcion.setText(descripcion);
+            txtReferencia.setText(referencia);
+            txtCoordenadas.setText(coordenadas);
+            ComboBoxCarta.setSelectedItem(cartaTopografica);
+            ComboBoxCarta1.setSelectedItem(tipo);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+  public void llenarCamposDesdeTabla() {
+    int filaSeleccionada = visor.getSelectedRow();
+    if (filaSeleccionada == -1) {
+        return;
+    }
+    String nombre = visor.getValueAt(filaSeleccionada, 1).toString();
+    String descripcion = visor.getValueAt(filaSeleccionada, 2).toString();
+    String referencia = visor.getValueAt(filaSeleccionada, 3).toString();
+    String coordenadas = visor.getValueAt(filaSeleccionada, 4).toString();
+    String cartaTopografica = visor.getValueAt(filaSeleccionada, 5).toString();
+    String tipo = visor.getValueAt(filaSeleccionada, 6).toString();
+    txtNombre.setText(nombre);
+    txtDescripcion.setText(descripcion);
+    txtReferencia.setText(referencia);
+    txtCoordenadas.setText(coordenadas);
+    ComboBoxCarta.setSelectedItem(cartaTopografica); 
+    ComboBoxCarta1.setSelectedItem(tipo); 
+}
+  public void eliminarRegistro() {
+    int filaSeleccionada = visor.getSelectedRow();
+     Connection conn = null;
+     String SQL = "SELECT * FROM sitios";
+     Statement st;
+     CONECTOR con=new CONECTOR();
+     conn = con.getConexion();
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar.");
+        return; 
+    }
+
+    // Obtiene el ID del registro a eliminar
+    String id = visor.getValueAt(filaSeleccionada, 0).toString();
+    String sqlDelete = "DELETE FROM sitios WHERE id=?";
+    
+    try {
+        PreparedStatement preparedStatement = conn.prepareStatement(sqlDelete);
+        preparedStatement.setString(1, id);
+        int rowsAffected = preparedStatement.executeUpdate();
+        
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Registro eliminado exitosamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro.");
+        }
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
+    }
+
+ 
+}
+   public void mostrar( String Tabla){
+        Connection conn = null;
+         String SQL = "SELECT * FROM sitios";
+         Statement st;
+         CONECTOR con=new CONECTOR();
+        conn = con.getConexion();
+        System.out.println(SQL);
+        DefaultTableModel model= new DefaultTableModel();
+         model.addColumn("id");
+         model.addColumn("nombre");
+         model.addColumn("descripcion");
+         model.addColumn("referencia");
+         model.addColumn("coordenadas");
+         model.addColumn("CartaTopografica");
+         model.addColumn("tipo");
+         visor.setModel(model);
+         String [] datos =new String[7];
+         try {
+            st = conn.createStatement();
+            ResultSet rs = st.executeQuery(SQL);
+            while(rs.next()){
+                datos[0]=rs.getString(1);
+                datos[1]=rs.getString(2);
+                datos[2]=rs.getString(3);
+                datos[3]=rs.getString(4);
+                datos[4]=rs.getString(5);
+                datos[5]=rs.getString(6);
+                datos[6]=rs.getString(7);
+                model.addRow(datos);
+                
+            }
+        } catch (SQLException e) {
+             JOptionPane.showMessageDialog(null, "ERROR" );
+        }
+         
+        
+    }
+    //METODOSESTRUCTURAS
+    private void registrarEstructura() {
+    Connection conn = null;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        conn = cn.getConexion();
+        String nombre = txtNombreE.getText();
+        String descripcion = txtDescripcionE.getText();
+        String referencia = txtReferenciaE.getText();
+        Object nombreSitioSeleccionado = ComboBoxE.getSelectedItem();
+        if (nombreSitioSeleccionado != null && !nombre.isEmpty() && !descripcion.isEmpty() && !referencia.isEmpty()) {
+            String nombreSitio = nombreSitioSeleccionado.toString();
+            String sql = "INSERT INTO estructuras (nombre, descripcion, referencia, sitio_id) VALUES (?, ?, ?, (SELECT id FROM SITIOS WHERE nombre = ?))";
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, descripcion);
+            ps.setString(3, referencia);
+            ps.setString(4, nombreSitio);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudieron insertar los datos.");
+                JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos obligatorios y seleccione un sitio antes de registrar la estructura.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al registrar la estructura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+      public void mostrarEstructura( String Tabla){
+        Connection conn = null;
+         String SQL = "SELECT estructuras.*, sitios.nombre AS NombreSitio FROM estructuras JOIN sitios ON estructuras.sitio_id = sitios.id;";
+         Statement st;
+         CONECTOR con=new CONECTOR();
+        conn = con.getConexion();
+        System.out.println(SQL);
+        DefaultTableModel model= new DefaultTableModel();
+         model.addColumn("id");
+         model.addColumn("nombre");
+         model.addColumn("descripcion");
+         model.addColumn("referencia");
+         model.addColumn("sitio_id");
+          model.addColumn("NombreSitio");
+      
+         visorEstructuras.setModel(model);
+         String [] datos =new String[6];
+         try {
+            st = conn.createStatement();
+            ResultSet rs = st.executeQuery(SQL);
+            while(rs.next()){
+                datos[0]=rs.getString(1);
+                datos[1]=rs.getString(2);
+                datos[2]=rs.getString(3);
+                datos[3]=rs.getString(4);
+                datos[4]=rs.getString(5);
+                 datos[5]=rs.getString(6);
+                model.addRow(datos);
+                
+            }
+        } catch (SQLException e) {
+             JOptionPane.showMessageDialog(null, "ERROR" );
+        }
+         
+        
+    }
+
+    public void editarRegistro() {
+    int filaSeleccionada = visorEstructuras.getSelectedRow();
+
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(null, "Selecciona una fila para editar.");
+        return;
+    }
+
+    int clavePrimaria = obtenerClavePrimariaDelRegistro(filaSeleccionada);
+    String nombre = visorEstructuras.getValueAt(filaSeleccionada, 1).toString();
+    String descripcion = visorEstructuras.getValueAt(filaSeleccionada, 2).toString();
+    String referencia = visorEstructuras.getValueAt(filaSeleccionada, 3).toString();
+    String sitio = visorEstructuras.getValueAt(filaSeleccionada, 5).toString();
+
+    txtNombreE.setText(nombre);
+    txtDescripcionE.setText(descripcion);
+    txtReferenciaE.setText(referencia);
+    ComboBoxE.setSelectedItem(sitio);
+}
+
+private int obtenerClavePrimariaDelRegistro(int filaSeleccionada) {
+    try {
+        Object valorCelda = visorEstructuras.getValueAt(filaSeleccionada, 0);
+
+        if (valorCelda instanceof Integer) {
+            return (Integer) valorCelda;
+        } else if (valorCelda instanceof String) {
+            try {
+                return Integer.parseInt((String) valorCelda);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                throw new IllegalArgumentException("El valor en la celda no es una clave primaria válida.");
+            }
+        }
+    } catch (IndexOutOfBoundsException e) {
+        JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        throw new IllegalArgumentException("No se pudo obtener la clave primaria.");
+    }
+
+    JOptionPane.showMessageDialog(null, "No se pudo obtener la clave primaria.", "Error", JOptionPane.ERROR_MESSAGE);
+    throw new IllegalArgumentException("No se pudo obtener la clave primaria.");
+}
+
+
+private void actualizarRegistro() {
+    Connection conn = null;
+    PreparedStatement ps = null;
+
+    try {
+        CONECTOR cn = new CONECTOR();
+        conn = cn.getConexion();
+        int filaSeleccionada = visorEstructuras.getSelectedRow();
+        int clavePrimaria = obtenerClavePrimariaDelRegistro(filaSeleccionada);
+        String nombre = txtNombreE.getText();
+        String descripcion = txtDescripcionE.getText();
+        String referencia = txtReferenciaE.getText();
+        Object nombreSitioSeleccionado = ComboBoxE.getSelectedItem();
+
+        if (nombreSitioSeleccionado != null && !nombre.isEmpty() && !descripcion.isEmpty() && !referencia.isEmpty()) {
+            String nombreSitio = nombreSitioSeleccionado.toString();
+
+            String sql = "UPDATE estructuras SET nombre = ?, descripcion = ?, referencia = ?, sitio_id = (SELECT id FROM SITIOS WHERE nombre = ?) WHERE id = ?";
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, descripcion);
+            ps.setString(3, referencia);
+            ps.setString(4, nombreSitio);
+            ps.setInt(5, clavePrimaria);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "Los datos se han actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudieron actualizar los datos.");
+                JOptionPane.showMessageDialog(null, "No se pudieron actualizar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos obligatorios y seleccione un sitio antes de actualizar la estructura.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al actualizar la estructura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+private void eliminarRegistroEstrutura() {
+    Connection conn = null;
+    PreparedStatement ps = null;
+
+    try {
+        CONECTOR cn = new CONECTOR();
+        conn = cn.getConexion();
+
+        int filaSeleccionada = visorEstructuras.getSelectedRow();
+
+        int clavePrimaria = obtenerClavePrimariaDelRegistro(filaSeleccionada);
+
+        if (clavePrimaria != -1) {
+            String sql = "DELETE FROM estructuras WHERE id = ?";
+
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, clavePrimaria);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "El registro se ha eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudo eliminar el registro.");
+                JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Seleccione una fila antes de eliminar el registro.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+  private void limpiarCamposEstructura() {
+    txtNombreE.setText(""); // Limpia el campo de texto
+    txtDescripcionE.setText(""); // Limpia el campo de texto
+    txtReferenciaE.setText(""); // Limpia el campo de texto
+    ComboBoxE.setSelectedIndex(0); // Establece el índice del JComboBox a la opción predeterminada
+}
+
+    //METODOSLOCUS
+    //METODOS MATERIALES
+    //OTROS METODOS
     public void Autocompleter(JComboBox txtCarta){
        Connection conn;
        CONECTOR cn = new CONECTOR();
@@ -83,464 +528,30 @@ public class FramePrincipal extends javax.swing.JFrame {
  
     
 }
-private void Insertar(String nombre, String descripcion, String referencia, String coordenadas, String carta, String tipo) {
-    Connection conn = null;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps = null;
-    ResultSet rs;
 
-    try {
-        conn = cn.getConexion();
-        String sql = "INSERT INTO sitios (nombre, descripcion, referencia, coordenadas, CartaTopografica , tipo) VALUES (?, ?, ?, ?, ?, ?)";
-        String elementoSeleccionado = ComboBoxCarta.getSelectedItem().toString();
-            String elementoSeleccionado1 = ComboBoxCarta1.getSelectedItem().toString();
-        ps = conn.prepareStatement(sql);
-        ps.setString(1, nombre);
-        ps.setString(2, descripcion);
-        ps.setString(3, referencia);
-        ps.setString(4, coordenadas);
-        ps.setString(5, elementoSeleccionado);
-        ps.setString(6, elementoSeleccionado1);
-
-        int filasAfectadas = ps.executeUpdate();
-        if (filasAfectadas > 0) {
-          JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);;
-        } else {
-            System.out.println("No se pudieron insertar los datos.");
-            JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    } catch (SQLException e) {
-        System.out.print(e.toString());
-    } finally {
-        // Cerrar la conexión y el PreparedStatement
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            System.out.print(e);
-        }
-    }
-}
-
-private void cargarSitios() {
-    Connection conn = null;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    try {
-        conn = cn.getConexion();
-        // Consulta SQL para obtener los nombres de todos los sitios
-        String sql = "SELECT id, nombre FROM SITIOS ";
-        ps = conn.prepareStatement(sql);
-        rs = ps.executeQuery();
-
-        // Limpiar el JComboBox antes de cargar los nombres
-        ComboBoxE.removeAllItems();
-
-        while (rs.next()) {
-            String nombreSitio = rs.getString("nombre");
-            ComboBoxE.addItem(nombreSitio);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error al cargar los sitios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        // Cerrar la conexión y los recursos
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
-
-private void registrarEstructura() {
-    Connection conn = null;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    try {
-        conn = cn.getConexion();
-        
-        // Obtén los valores de los campos de texto
-        String nombre = txtNombreE.getText();
-        String descripcion = txtDescripcionE.getText();
-        String referencia = txtReferenciaE.getText();
-        String nombreSitioSeleccionado =  ComboBoxE.getSelectedItem().toString();
-
-        if (!nombreSitioSeleccionado.isEmpty()) {
-            String sql = "INSERT INTO estructuras (nombre, descripcion, referencia, sitio_id) VALUES (?, ?, ?, (SELECT id FROM SITIOS WHERE nombre = ?))";
-
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, nombre);
-            ps.setString(2, descripcion);
-            ps.setString(3, referencia);
-            ps.setString(4, nombreSitioSeleccionado);
-
-            int filasAfectadas = ps.executeUpdate();
-            if (filasAfectadas > 0) {
-                JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                System.out.println("No se pudieron insertar los datos.");
-                JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Por favor, seleccione un sitio antes de registrar la estructura.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error al registrar la estructura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        // Cerrar la conexión y los recursos
-        try {
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
-
-
-
-
-
-
- public void insertarDesdeTextField(JTextField txtNombre, JTextField txtDescripcion, JTextField txtReferencia,  JTextField txtCoordenadas, JComboBox ComboBoxCarta,  JComboBox ComboBoxCarta1) {
-        String nombre = txtNombre.getText();
-        String descripcion = txtDescripcion.getText();
-        String referencia = txtReferencia.getText();
-        String coordenadas = txtCoordenadas.getText();
-        String carta = ComboBoxCarta.getSelectedItem().toString();
-        String tipo =  ComboBoxCarta1.getSelectedItem().toString();;
-
-        Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
-    }
- public void cargarDatosDesdeTabla() {
-  Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        // Conecta a la base de datos SQLite (reemplaza con tu URL y credenciales)
-     
-      CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-        // Prepara la consulta SQL para obtener la primera fila de la tabla (reemplaza "tu_tabla" con el nombre de tu tabla)
-        String sql = "SELECT * FROM sitios";
-        stmt = conn.prepareStatement(sql);
-
-        // Ejecuta la consulta
-        rs = stmt.executeQuery();
-
-        // Verifica si hay datos y carga los valores en los JTextField
-        if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String descripcion = rs.getString("descripcion");
-            String referencia = rs.getString("referencia");
-            String coordenadas = rs.getString("coordenadas");
-            String cartaTopografica = rs.getString("CartaTopografica");
-            String tipo = rs.getString("tipo");
-
-            txtNombre.setText(nombre);
-            txtDescripcion.setText(descripcion);
-            txtReferencia.setText(referencia);
-            txtCoordenadas.setText(coordenadas);
-            ComboBoxCarta.setSelectedItem(cartaTopografica);
-            ComboBoxCarta1.setSelectedItem(tipo);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    } finally {
-        try {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
- public void llenarCamposDesdeTabla() {
-    // Obtén la fila seleccionada de la tabla
-    int filaSeleccionada = visor.getSelectedRow();
-
-    // Verifica si se ha seleccionado una fila
-    if (filaSeleccionada == -1) {
-        // Si no se ha seleccionado una fila, no hagas nada
-        return;
-    }
-
-    // Obtiene los datos de la fila seleccionada
-    String nombre = visor.getValueAt(filaSeleccionada, 1).toString();
-    String descripcion = visor.getValueAt(filaSeleccionada, 2).toString();
-    String referencia = visor.getValueAt(filaSeleccionada, 3).toString();
-    String coordenadas = visor.getValueAt(filaSeleccionada, 4).toString();
-    String cartaTopografica = visor.getValueAt(filaSeleccionada, 5).toString();
-    String tipo = visor.getValueAt(filaSeleccionada, 6).toString();
-
-    // Llena los campos de texto y ComboBox con los valores obtenidos
-    txtNombre.setText(nombre);
-    txtDescripcion.setText(descripcion);
-    txtReferencia.setText(referencia);
-    txtCoordenadas.setText(coordenadas);
-    ComboBoxCarta.setSelectedItem(cartaTopografica); // Establece el valor seleccionado en el ComboBox
-    ComboBoxCarta1.setSelectedItem(tipo); // Establece el valor seleccionado en el ComboBox
-}
-
-
- public void editarRegistro() {
-    // Obtén la fila seleccionada de la tabla
-    int filaSeleccionada = visor.getSelectedRow();
-
-    // Verifica si se ha seleccionado una fila
-    if (filaSeleccionada == -1) {
-        JOptionPane.showMessageDialog(null, "Selecciona una fila para editar.");
-        return; // Sal del método si no se ha seleccionado una fila
-    }
-      Connection conn = null;
-      CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-
-    // Obtiene los datos de la fila seleccionada
-    String id = visor.getValueAt(filaSeleccionada, 0).toString();
-    String nombre = visor.getValueAt(filaSeleccionada, 1).toString();
-    String descripcion = visor.getValueAt(filaSeleccionada, 2).toString();
-    String referencia = visor.getValueAt(filaSeleccionada, 3).toString();
-    String coordenadas = visor.getValueAt(filaSeleccionada, 4).toString();
-    String cartaTopografica = visor.getValueAt(filaSeleccionada, 5).toString();
-    String tipo = visor.getValueAt(filaSeleccionada, 6).toString();
-      txtNombre.setText(nombre);
-    txtDescripcion.setText(descripcion);
-    txtReferencia.setText(referencia);
-    txtCoordenadas.setText(coordenadas);
-   ComboBoxCarta.getSelectedItem();
-    ComboBoxCarta1.getSelectedItem();
-    
-
-    // Aquí defines la sentencia SQL para actualizar el registro
-    String sqlUpdate = "UPDATE sitios SET nombre=?, descripcion=?, referencia=?, coordenadas=?, CartaTopografica=?, tipo=? WHERE id=?";
-    
-    try {
-        PreparedStatement preparedStatement = conn.prepareStatement(sqlUpdate);
-        preparedStatement.setString(1, nombre);
-        preparedStatement.setString(2, descripcion);
-        preparedStatement.setString(3, referencia);
-        preparedStatement.setString(4, coordenadas);
-        preparedStatement.setString(5, cartaTopografica);
-        preparedStatement.setString(6, tipo);
-        preparedStatement.setString(7, id);
-        
-        // Ejecuta la sentencia de actualización
-        int rowsAffected = preparedStatement.executeUpdate();
-        
-        if (rowsAffected > 0) {
-            JOptionPane.showMessageDialog(null, "Registro actualizado exitosamente.");
-            
-            // Aquí puedes actualizar la tabla nuevamente para reflejar los cambios
-        } else {
-            JOptionPane.showMessageDialog(null, "No se pudo actualizar el registro.");
-        }
-        
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al actualizar el registro: " + e.getMessage());
-    }
-
-    // Ahora puedes utilizar estos valores para editar el registro
-    // Puedes abrir un formulario de edición y cargar estos valores en él
-    // Luego, actualiza la base de datos con los nuevos valores
-}
-public void eliminarRegistro() {
-    // Obtén la fila seleccionada de la tabla
-    int filaSeleccionada = visor.getSelectedRow();
-     Connection conn = null;
-         String SQL = "SELECT * FROM sitios";
-         Statement st;
-         CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-
-    // Verifica si se ha seleccionado una fila
-    if (filaSeleccionada == -1) {
-        JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar.");
-        return; // Sal del método si no se ha seleccionado una fila
-    }
-
-    // Obtiene el ID del registro a eliminar
-    String id = visor.getValueAt(filaSeleccionada, 0).toString();
-
-
-    // Aquí defines la sentencia SQL para eliminar el registro
-    String sqlDelete = "DELETE FROM sitios WHERE id=?";
-    
-    try {
-        PreparedStatement preparedStatement = conn.prepareStatement(sqlDelete);
-        preparedStatement.setString(1, id);
-        
-        // Ejecuta la sentencia de eliminación
-        int rowsAffected = preparedStatement.executeUpdate();
-        
-        if (rowsAffected > 0) {
-            JOptionPane.showMessageDialog(null, "Registro eliminado exitosamente.");
-            
-            // Aquí puedes actualizar la tabla nuevamente para reflejar los cambios
-        } else {
-            JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro.");
-        }
-        
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
-    }
-
- 
-}
-
-    public void mostrar( String Tabla){
-        Connection conn = null;
-         String SQL = "SELECT * FROM sitios";
-         Statement st;
-         CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-        System.out.println(SQL);
-        DefaultTableModel model= new DefaultTableModel();
-         model.addColumn("id");
-         model.addColumn("nombre");
-         model.addColumn("descripcion");
-         model.addColumn("referencia");
-         model.addColumn("coordenadas");
-         model.addColumn("CartaTopografica");
-         model.addColumn("tipo");
-         visor.setModel(model);
-         String [] datos =new String[7];
-         try {
-            st = conn.createStatement();
-            ResultSet rs = st.executeQuery(SQL);
-            while(rs.next()){
-                datos[0]=rs.getString(1);
-                datos[1]=rs.getString(2);
-                datos[2]=rs.getString(3);
-                datos[3]=rs.getString(4);
-                datos[4]=rs.getString(5);
-                datos[5]=rs.getString(6);
-                datos[6]=rs.getString(7);
-                model.addRow(datos);
-                
-            }
-        } catch (SQLException e) {
-             JOptionPane.showMessageDialog(null, "ERROR" );
-        }
-         
-        
-    }
-     public void mostrarEstructura( String Tabla){
-        Connection conn = null;
-         String SQL = "SELECT estructuras.*, sitios.nombre AS NombreSitio FROM estructuras JOIN sitios ON estructuras.sitio_id = sitios.id;";
-         Statement st;
-         CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-        System.out.println(SQL);
-        DefaultTableModel model= new DefaultTableModel();
-         model.addColumn("id");
-         model.addColumn("nombre");
-         model.addColumn("descripcion");
-         model.addColumn("referencia");
-         model.addColumn("sitio_id");
-          model.addColumn("NombreSitio");
-      
-         visorEstructuras.setModel(model);
-         String [] datos =new String[6];
-         try {
-            st = conn.createStatement();
-            ResultSet rs = st.executeQuery(SQL);
-            while(rs.next()){
-                datos[0]=rs.getString(1);
-                datos[1]=rs.getString(2);
-                datos[2]=rs.getString(3);
-                datos[3]=rs.getString(4);
-                datos[4]=rs.getString(5);
-                 datos[5]=rs.getString(6);
-                model.addRow(datos);
-                
-            }
-        } catch (SQLException e) {
-             JOptionPane.showMessageDialog(null, "ERROR" );
-        }
-         
-        
-    }
-      public void cargarDatosEstructura() {
-  Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        // Conecta a la base de datos SQLite (reemplaza con tu URL y credenciales)
-     
-      CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-        // Prepara la consulta SQL para obtener la primera fila de la tabla (reemplaza "tu_tabla" con el nombre de tu tabla)
-        String sql = "SELECT * FROM sitios";
-        stmt = conn.prepareStatement(sql);
-
-        // Ejecuta la consulta
-        rs = stmt.executeQuery();
-
-        // Verifica si hay datos y carga los valores en los JTextField
-        if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String descripcion = rs.getString("descripcion");
-            String referencia = rs.getString("referencia");
-            String coordenadas = rs.getString("coordenadas");
-            String cartaTopografica = rs.getString("CartaTopografica");
-            String tipo = rs.getString("tipo");
-
-            txtNombre.setText(nombre);
-            txtDescripcion.setText(descripcion);
-            txtReferencia.setText(referencia);
-            txtCoordenadas.setText(coordenadas);
-            ComboBoxCarta.setSelectedItem(cartaTopografica);
-            ComboBoxCarta1.setSelectedItem(tipo);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    } finally {
-        try {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
-
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        btnSitios = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        btnLocus = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        btnEstructuras = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        casa = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        btnLocus1 = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        btnLocus2 = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
+        jLabel18 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         vtnVentanas = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
@@ -580,303 +591,12 @@ public void eliminarRegistro() {
         jLabel22 = new javax.swing.JLabel();
         ComboBoxE = new javax.swing.JComboBox<>();
         jPanel5 = new javax.swing.JPanel();
-        btnSitios = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        btnLocus = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        btnEstructuras = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        casa = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        btnLocus1 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        btnLocus2 = new javax.swing.JPanel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
-        jLabel18 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 183, 164));
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        visor.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        visor.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                visorMouseClicked(evt);
-            }
-        });
-        jScrollPane1.setViewportView(visor);
-
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 530, -1));
-
-        jLabel3.setText("NOMBRE:");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, -1, -1));
-
-        jLabel9.setText("DESCRIPCION:");
-        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 40, -1, -1));
-
-        jLabel10.setText("REFERENCIA:");
-        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, -1, -1));
-
-        jLabel11.setText("COORDENADAS:");
-        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 200, -1, -1));
-
-        jLabel12.setText("CARTA TOPOGRAFICA:");
-        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 240, -1, -1));
-
-        jLabel13.setText("TIPO:");
-        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 240, -1, -1));
-        jPanel3.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 10, 160, -1));
-
-        txtDescripcion.setColumns(20);
-        txtDescripcion.setRows(5);
-        jScrollPane2.setViewportView(txtDescripcion);
-
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 40, -1, -1));
-        jPanel3.add(txtReferencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 160, 180, -1));
-        jPanel3.add(txtCoordenadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 200, 180, -1));
-
-        ComboBoxCarta.setForeground(new java.awt.Color(255, 204, 0));
-        ComboBoxCarta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ComboBoxCartaActionPerformed(evt);
-            }
-        });
-        jPanel3.add(ComboBoxCarta, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 240, -1, -1));
-        jPanel3.add(ComboBoxCarta1, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 240, -1, -1));
-
-        btnRegistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
-        btnRegistrar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnRegistrarMouseMoved(evt);
-            }
-        });
-        btnRegistrar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnRegistrarMouseExited(evt);
-            }
-        });
-        btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRegistrarActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 280, -1, -1));
-
-        btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
-        btnEditar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnEditarMouseMoved(evt);
-            }
-        });
-        btnEditar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnEditarMouseExited(evt);
-            }
-        });
-        btnEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 280, -1, -1));
-
-        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/DELETE.png"))); // NOI18N
-        btnEliminar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnEliminarMouseMoved(evt);
-            }
-        });
-        btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnEliminarMouseExited(evt);
-            }
-        });
-        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 280, -1, -1));
-
-        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
-        btnLimpiar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnLimpiarMouseMoved(evt);
-            }
-        });
-        btnLimpiar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLimpiarMouseExited(evt);
-            }
-        });
-        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiarActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 60));
-
-        vtnVentanas.addTab("SITIOS", jPanel3);
-
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        visorEstructuras.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(visorEstructuras);
-
-        jPanel4.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
-
-        btnEliminar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/DELETE.png"))); // NOI18N
-        btnEliminar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnEliminar1MouseMoved(evt);
-            }
-        });
-        btnEliminar1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnEliminar1MouseExited(evt);
-            }
-        });
-        btnEliminar1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminar1ActionPerformed(evt);
-            }
-        });
-        jPanel4.add(btnEliminar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 280, -1, -1));
-
-        btnLimpiar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
-        btnLimpiar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnLimpiar1MouseMoved(evt);
-            }
-        });
-        btnLimpiar1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLimpiar1MouseExited(evt);
-            }
-        });
-        btnLimpiar1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiar1ActionPerformed(evt);
-            }
-        });
-        jPanel4.add(btnLimpiar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 60));
-
-        btnRegistrar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
-        btnRegistrar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnRegistrar1MouseMoved(evt);
-            }
-        });
-        btnRegistrar1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnRegistrar1MouseExited(evt);
-            }
-        });
-        btnRegistrar1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRegistrar1ActionPerformed(evt);
-            }
-        });
-        jPanel4.add(btnRegistrar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 280, -1, -1));
-
-        btnEditar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
-        btnEditar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnEditar1MouseMoved(evt);
-            }
-        });
-        btnEditar1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnEditar1MouseExited(evt);
-            }
-        });
-        btnEditar1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditar1ActionPerformed(evt);
-            }
-        });
-        jPanel4.add(btnEditar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 280, -1, -1));
-
-        jLabel19.setText("NOMBRE :");
-        jPanel4.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 30, -1, -1));
-
-        jLabel20.setText("DESCRIPCIÓN:");
-        jPanel4.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 70, -1, -1));
-
-        jLabel21.setText("REFERENCIAS:");
-        jPanel4.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 180, -1, -1));
-        jPanel4.add(txtNombreE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 30, 120, -1));
-
-        txtDescripcionE.setColumns(20);
-        txtDescripcionE.setRows(5);
-        jScrollPane4.setViewportView(txtDescripcionE);
-
-        jPanel4.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 70, -1, -1));
-        jPanel4.add(txtReferenciaE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 170, 130, -1));
-
-        jLabel22.setText("NOMBRE DEL SITIO:");
-        jPanel4.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 210, -1, -1));
-
-        ComboBoxE.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ComboBoxEActionPerformed(evt);
-            }
-        });
-        jPanel4.add(ComboBoxE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 210, 120, -1));
-
-        vtnVentanas.addTab("ESTRUCTURAS", jPanel4);
-
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        vtnVentanas.addTab("LOCUS", jPanel5);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(vtnVentanas, javax.swing.GroupLayout.Alignment.TRAILING)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(vtnVentanas, javax.swing.GroupLayout.PREFERRED_SIZE, 461, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 900, 410));
 
         btnSitios.setBackground(new java.awt.Color(96, 219, 164));
         btnSitios.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -1118,6 +838,284 @@ public void eliminarRegistro() {
         jLabel18.setText("MARCOS");
         jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 150, -1));
 
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        visor.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        visor.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                visorMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(visor);
+
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 530, -1));
+
+        jLabel3.setText("NOMBRE:");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, -1, -1));
+
+        jLabel9.setText("DESCRIPCION:");
+        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 40, -1, -1));
+
+        jLabel10.setText("REFERENCIA:");
+        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, -1, -1));
+
+        jLabel11.setText("COORDENADAS:");
+        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 200, -1, -1));
+
+        jLabel12.setText("CARTA TOPOGRAFICA:");
+        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 240, -1, -1));
+
+        jLabel13.setText("TIPO:");
+        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 240, -1, -1));
+        jPanel3.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 10, 160, -1));
+
+        txtDescripcion.setColumns(20);
+        txtDescripcion.setRows(5);
+        jScrollPane2.setViewportView(txtDescripcion);
+
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 40, -1, -1));
+        jPanel3.add(txtReferencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 160, 180, -1));
+        jPanel3.add(txtCoordenadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 200, 180, -1));
+
+        ComboBoxCarta.setForeground(new java.awt.Color(255, 204, 0));
+        ComboBoxCarta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboBoxCartaActionPerformed(evt);
+            }
+        });
+        jPanel3.add(ComboBoxCarta, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 240, -1, -1));
+        jPanel3.add(ComboBoxCarta1, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 240, -1, -1));
+
+        btnRegistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
+        btnRegistrar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnRegistrarMouseMoved(evt);
+            }
+        });
+        btnRegistrar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnRegistrarMouseExited(evt);
+            }
+        });
+        btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 280, -1, -1));
+
+        btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
+        btnEditar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnEditarMouseMoved(evt);
+            }
+        });
+        btnEditar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEditarMouseExited(evt);
+            }
+        });
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 280, -1, -1));
+
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/DELETE.png"))); // NOI18N
+        btnEliminar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnEliminarMouseMoved(evt);
+            }
+        });
+        btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEliminarMouseExited(evt);
+            }
+        });
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 280, -1, -1));
+
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
+        btnLimpiar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnLimpiarMouseMoved(evt);
+            }
+        });
+        btnLimpiar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnLimpiarMouseExited(evt);
+            }
+        });
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 60));
+
+        vtnVentanas.addTab("SITIOS", jPanel3);
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        visorEstructuras.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        visorEstructuras.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                visorEstructurasMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(visorEstructuras);
+
+        jPanel4.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        btnEliminar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/DELETE.png"))); // NOI18N
+        btnEliminar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnEliminar1MouseMoved(evt);
+            }
+        });
+        btnEliminar1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEliminar1MouseExited(evt);
+            }
+        });
+        btnEliminar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminar1ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btnEliminar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 280, -1, -1));
+
+        btnLimpiar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
+        btnLimpiar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnLimpiar1MouseMoved(evt);
+            }
+        });
+        btnLimpiar1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnLimpiar1MouseExited(evt);
+            }
+        });
+        btnLimpiar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiar1ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btnLimpiar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 60));
+
+        btnRegistrar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
+        btnRegistrar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnRegistrar1MouseMoved(evt);
+            }
+        });
+        btnRegistrar1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnRegistrar1MouseExited(evt);
+            }
+        });
+        btnRegistrar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrar1ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btnRegistrar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 280, -1, -1));
+
+        btnEditar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
+        btnEditar1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnEditar1MouseMoved(evt);
+            }
+        });
+        btnEditar1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEditar1MouseExited(evt);
+            }
+        });
+        btnEditar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditar1ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btnEditar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 280, -1, -1));
+
+        jLabel19.setText("NOMBRE :");
+        jPanel4.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 30, -1, -1));
+
+        jLabel20.setText("DESCRIPCIÓN:");
+        jPanel4.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 70, -1, -1));
+
+        jLabel21.setText("REFERENCIAS:");
+        jPanel4.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 180, -1, -1));
+        jPanel4.add(txtNombreE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 30, 120, -1));
+
+        txtDescripcionE.setColumns(20);
+        txtDescripcionE.setRows(5);
+        jScrollPane4.setViewportView(txtDescripcionE);
+
+        jPanel4.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 70, -1, -1));
+        jPanel4.add(txtReferenciaE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 170, 130, -1));
+
+        jLabel22.setText("NOMBRE DEL SITIO:");
+        jPanel4.add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 210, -1, -1));
+
+        ComboBoxE.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboBoxEActionPerformed(evt);
+            }
+        });
+        jPanel4.add(ComboBoxE, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 210, 120, -1));
+
+        vtnVentanas.addTab("ESTRUCTURAS", jPanel4);
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        vtnVentanas.addTab("LOCUS", jPanel5);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(vtnVentanas, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(vtnVentanas, javax.swing.GroupLayout.PREFERRED_SIZE, 461, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 900, 410));
+
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGES/vecteezy_abstract-gradient-background-with-green-and-blue-colors_6895305.jpg"))); // NOI18N
         jLabel2.setText("jLabel2");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-9, 0, 2010, 1080));
@@ -1214,6 +1212,7 @@ btnRegistrar.setToolTipText("REGISTRAR NUEVO SITIO");
         // Aquí llama a la función para insertar datos en la base de datos
         Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
          mostrar("sitios");
+         cargarSitios();
           
         // TODO add your handling code here:
     }//GEN-LAST:event_btnRegistrarActionPerformed
@@ -1235,14 +1234,15 @@ int respuesta = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quie
         btnEditar.setToolTipText("Modificar formulario");
         editarRegistro();
         mostrar("sitios");
- 
-// TODO add your handling code here:
+        cargarSitios();
+
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 btnEliminar.setToolTipText("Eliminar formulario");
-        eliminarRegistro();
+ eliminarRegistro();
  mostrar("sitios");
+cargarSitios();
         // TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
 
@@ -1302,7 +1302,18 @@ btnLimpiar.setBackground(new Color(96,219,164 ));
     }//GEN-LAST:event_btnEliminar1MouseExited
 
     private void btnEliminar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminar1ActionPerformed
-        // TODO add your handling code here:
+ int filaSeleccionada = visorEstructuras.getSelectedRow();
+    
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(null, "Por favor, seleccione una fila antes de eliminar el registro.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        int opcion = JOptionPane.showConfirmDialog(null, "¿Seguro que desea eliminar el registro?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+        
+        if (opcion == JOptionPane.YES_OPTION) {
+            eliminarRegistroEstrutura(); // Llama al método eliminarRegistro si el usuario confirma
+              mostrarEstructura("estructuras");
+        }
+    }      
     }//GEN-LAST:event_btnEliminar1ActionPerformed
 
     private void btnLimpiar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiar1MouseMoved
@@ -1314,6 +1325,13 @@ btnLimpiar.setBackground(new Color(96,219,164 ));
     }//GEN-LAST:event_btnLimpiar1MouseExited
 
     private void btnLimpiar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar1ActionPerformed
+limpiarCamposEstructura();
+btnLimpiar1.setToolTipText("Limpiar formulario");
+    txtNombreE.setText("");
+    txtDescripcionE.setText("");
+    txtReferenciaE.setText("");
+    ComboBoxE.setSelectedIndex(0);
+   
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLimpiar1ActionPerformed
 
@@ -1327,8 +1345,7 @@ btnLimpiar.setBackground(new Color(96,219,164 ));
 
     private void btnRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrar1ActionPerformed
 registrarEstructura(); 
-cargarSitios();
-
+ mostrarEstructura("estructuras");
        
      
 
@@ -1345,7 +1362,8 @@ cargarSitios();
     }//GEN-LAST:event_btnEditar1MouseExited
 
     private void btnEditar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditar1ActionPerformed
-        // TODO add your handling code here:
+actualizarRegistro();
+mostrarEstructura("estructuras");
     }//GEN-LAST:event_btnEditar1ActionPerformed
 
     private void ComboBoxEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxEActionPerformed
@@ -1356,6 +1374,12 @@ cargarSitios();
 llenarCamposDesdeTabla();
 // TODO add your handling code here:
     }//GEN-LAST:event_visorMouseClicked
+
+    private void visorEstructurasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorEstructurasMouseClicked
+editarRegistro();
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_visorEstructurasMouseClicked
 
     /**
      * @param args the command line arguments
