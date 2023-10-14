@@ -33,6 +33,8 @@ public class FramePrincipal extends javax.swing.JFrame {
         Autocompleter(ComboBoxCarta);
         AutocompleterTwo(ComboBoxCarta1);
         cargarSitios();
+        mostrarLocus();
+        cargarLocusCombo();
     }
     //METODOSSITIOS
     //METODOPARAREGISTRAR UN NUEVO SITIO
@@ -214,7 +216,6 @@ public class FramePrincipal extends javax.swing.JFrame {
          Statement st;
          CONECTOR con=new CONECTOR();
         conn = con.getConexion();
-        System.out.println(SQL);
         DefaultTableModel model= new DefaultTableModel();
          model.addColumn("id");
          model.addColumn("nombre");
@@ -300,7 +301,6 @@ public class FramePrincipal extends javax.swing.JFrame {
          Statement st;
          CONECTOR con=new CONECTOR();
         conn = con.getConexion();
-        System.out.println(SQL);
         DefaultTableModel model= new DefaultTableModel();
          model.addColumn("id");
          model.addColumn("nombre");
@@ -482,6 +482,238 @@ private void eliminarRegistroEstrutura() {
 }
 
     //METODOSLOCUS
+ private int obtenerClavePrimariaDelLocus(int filaSeleccionada) {
+    try {
+        Object valorCelda = visorLocus.getValueAt(filaSeleccionada, 0);
+
+        if (valorCelda instanceof Integer) {
+            return (Integer) valorCelda;
+        } else if (valorCelda instanceof String) {
+            try {
+                return Integer.parseInt((String) valorCelda);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                throw new IllegalArgumentException("El valor en la celda no es una clave primaria válida.");
+            }
+        }
+    } catch (IndexOutOfBoundsException e) {
+        JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        throw new IllegalArgumentException("No se pudo obtener la clave primaria.");
+    }
+
+    JOptionPane.showMessageDialog(null, "No se pudo obtener la clave primaria.", "Error", JOptionPane.ERROR_MESSAGE);
+    throw new IllegalArgumentException("No se pudo obtener la clave primaria.");
+}
+
+
+  
+  public void mostrarLocus() {
+    // Declaración de la conexión y otros objetos
+    try (Connection conn = new CONECTOR().getConexion();
+         Statement st = conn.createStatement()) {
+        String SQL = "SELECT locus.*, estructuras.nombre AS NombreEstructura FROM locus JOIN estructuras ON locus.estructura_id = estructuras.id;";
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("id");
+        model.addColumn("nombre");
+        model.addColumn("descripcion");
+        model.addColumn("referencia");
+        model.addColumn("estructura_id");
+        model.addColumn("NombreEstructura");
+
+        visorLocus.setModel(model);
+        String[] datos = new String[6];
+
+        ResultSet rs = st.executeQuery(SQL);
+        while (rs.next()) {
+            datos[0] = rs.getString("id");
+            datos[1] = rs.getString("nombre");
+            datos[2] = rs.getString("descripcion");
+            datos[3] = rs.getString("referencia");
+            datos[4] = rs.getString("estructura_id");
+            datos[5] = rs.getString("NombreEstructura");
+            model.addRow(datos);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // Muestra detalles del error en la consola.
+        JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage());
+    }
+}
+private void cargarLocusCombo() {
+    Connection conn = null;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+        conn = cn.getConexion();
+        String sql = "SELECT id, nombre FROM estructuras ";
+        ps = conn.prepareStatement(sql);
+        rs = ps.executeQuery();
+        // Limpiar el JComboBox antes de cargar los nombres
+        ComboBoxL1.removeAllItems();
+        while (rs.next()) {
+            String nombreSitio = rs.getString("nombre");
+            ComboBoxL1.addItem(nombreSitio);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al cargar los sitios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        // Cerrar la conexión y los recursos
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+public void editarLocus() {
+    int filaSeleccionada = visorLocus.getSelectedRow();
+
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(null, "Selecciona una fila de locus para editar.");
+        return;
+    }
+
+    // Obtener la clave primaria (ID) del registro de locus seleccionado
+    int clavePrimaria = obtenerClavePrimariaDelLocus(filaSeleccionada);
+    String nombre = visorLocus.getValueAt(filaSeleccionada, 1).toString();
+    String descripcion = visorLocus.getValueAt(filaSeleccionada, 2).toString();
+    String ubicacion = visorLocus.getValueAt(filaSeleccionada, 3).toString();
+    String referencia = visorLocus.getValueAt(filaSeleccionada, 4).toString();
+    String color = visorLocus.getValueAt(filaSeleccionada, 5).toString();
+
+    // Llenar los campos de edición con los valores obtenidos
+    txtNombreL.setText(nombre);
+    txtDescripcionL.setText(descripcion);
+    txtUbicacionL.setText(ubicacion);
+    txtReferenciaL.setText(referencia);
+    txtColorL.setText(color);
+}
+
+
+private void registrarLocus() {
+    Connection conn = null;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        conn = cn.getConexion();
+        String nombre = txtNombreL.getText();
+        String descripcion = txtDescripcionL.getText();
+        String ubicacion = txtUbicacionL.getText();
+        String referencia = txtReferenciaL.getText();
+        String color = txtColorL.getText();
+        Object nombreLocusSeleccionado = ComboBoxL1.getSelectedItem();
+        
+        if (nombreLocusSeleccionado != null && !nombre.isEmpty() && !descripcion.isEmpty() && !referencia.isEmpty()) {
+            String nombreLocus = nombreLocusSeleccionado.toString();
+            String sql = "INSERT INTO locus (nombre, descripcion, ubicacion, referencia, color, estructura_id) VALUES (?, ?, ?, ?, ?, (SELECT id FROM estructuras WHERE nombre = ?))";
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, descripcion);
+            ps.setString(3, ubicacion);
+            ps.setString(4, referencia);
+            ps.setString(5, color);
+            ps.setString(6, nombreLocus);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudieron insertar los datos.");
+                JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos obligatorios y seleccione un sitio antes de registrar la estructura.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al registrar la estructura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+private void actualizarLocus() {
+    Connection conn = null;
+    PreparedStatement ps = null;
+
+    try {
+        CONECTOR cn = new CONECTOR();
+        conn = cn.getConexion();
+        int filaSeleccionada = visorLocus.getSelectedRow();
+        int clavePrimaria = obtenerClavePrimariaDelRegistro(filaSeleccionada);
+        String nombre = txtNombreL.getText();
+        String descripcion = txtDescripcionL.getText();
+        String ubicacion = txtUbicacionL.getText();
+        String referencia = txtReferenciaL.getText();
+        String color = txtColorL.getText();
+        Object nombreSitioSeleccionado = ComboBoxL1.getSelectedItem();
+
+        if (nombreSitioSeleccionado != null && !nombre.isEmpty() && !descripcion.isEmpty() && !referencia.isEmpty()) {
+            String nombreSitio = nombreSitioSeleccionado.toString();
+
+            String sql = "UPDATE locus SET nombre = ?, descripcion = ?, ubicacion = ?, referencia = ?, color = ?, estructura_id = (SELECT id FROM estructuras WHERE nombre = ?) WHERE id = ?";
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, descripcion);
+            ps.setString(3, ubicacion);
+            ps.setString(4, referencia);
+            ps.setString(5, color);
+            ps.setString(6, nombreSitio);
+            ps.setInt(7, clavePrimaria);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "Los datos se han actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudieron actualizar los datos.");
+                JOptionPane.showMessageDialog(null, "No se pudieron actualizar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos obligatorios y seleccione un sitio antes de actualizar el locus.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al actualizar el locus: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+  
     //METODOS MATERIALES
     //OTROS METODOS
     public void Autocompleter(JComboBox txtCarta){
@@ -494,7 +726,6 @@ private void eliminarRegistroEstrutura() {
               conn = cn.getConexion();
               ps = conn.prepareStatement(sql);
               rs = ps.executeQuery();
-              System.out.println(rs.toString());
               while (rs.next()) {      
                   txtCarta.addItem(rs.getString("nombre"));
                   
@@ -516,7 +747,6 @@ private void eliminarRegistroEstrutura() {
               conn = cn.getConexion();
               ps = conn.prepareStatement(sql);
               rs = ps.executeQuery();
-              System.out.println(rs.toString());
               while (rs.next()) {      
                   txtCarta.addItem(rs.getString("Tipo"));
                   
@@ -591,6 +821,26 @@ private void eliminarRegistroEstrutura() {
         jLabel22 = new javax.swing.JLabel();
         ComboBoxE = new javax.swing.JComboBox<>();
         jPanel5 = new javax.swing.JPanel();
+        btnLimpiarLocus = new javax.swing.JButton();
+        txtReferenciaL = new javax.swing.JTextField();
+        btnEditarLocus = new javax.swing.JButton();
+        btnRegistrarLocus = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtDescripcionL = new javax.swing.JTextArea();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        btnEliminarLocus = new javax.swing.JButton();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        visorLocus = new javax.swing.JTable();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        txtNombreL = new javax.swing.JTextField();
+        ComboBoxL1 = new javax.swing.JComboBox<>();
+        jLabel27 = new javax.swing.JLabel();
+        txtUbicacionL = new javax.swing.JTextField();
+        jLabel28 = new javax.swing.JLabel();
+        txtColorL = new javax.swing.JTextField();
+        jPanel6 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1099,7 +1349,148 @@ private void eliminarRegistroEstrutura() {
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnLimpiarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
+        btnLimpiarLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnLimpiarLocusMouseMoved(evt);
+            }
+        });
+        btnLimpiarLocus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnLimpiarLocusMouseExited(evt);
+            }
+        });
+        btnLimpiarLocus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarLocusActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btnLimpiarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 290, 60, 60));
+        jPanel5.add(txtReferenciaL, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 70, 200, -1));
+
+        btnEditarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
+        btnEditarLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnEditarLocusMouseMoved(evt);
+            }
+        });
+        btnEditarLocus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEditarLocusMouseExited(evt);
+            }
+        });
+        btnEditarLocus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarLocusActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btnEditarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 290, -1, -1));
+
+        btnRegistrarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
+        btnRegistrarLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnRegistrarLocusMouseMoved(evt);
+            }
+        });
+        btnRegistrarLocus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnRegistrarLocusMouseExited(evt);
+            }
+        });
+        btnRegistrarLocus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarLocusActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btnRegistrarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 290, -1, -1));
+
+        txtDescripcionL.setColumns(20);
+        txtDescripcionL.setRows(5);
+        jScrollPane5.setViewportView(txtDescripcionL);
+
+        jPanel5.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 170, -1, -1));
+
+        jLabel23.setText("NOMBRE DE ESTRUCTURA:");
+        jPanel5.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 110, -1, -1));
+
+        jLabel24.setText("DESCRIPCIÓN:");
+        jPanel5.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 150, -1, -1));
+
+        btnEliminarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/DELETE.png"))); // NOI18N
+        btnEliminarLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnEliminarLocusMouseMoved(evt);
+            }
+        });
+        btnEliminarLocus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnEliminarLocusMouseExited(evt);
+            }
+        });
+        btnEliminarLocus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarLocusActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btnEliminarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 290, -1, -1));
+
+        visorLocus.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        visorLocus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                visorLocusMouseClicked(evt);
+            }
+        });
+        jScrollPane6.setViewportView(visorLocus);
+
+        jPanel5.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        jLabel25.setText("NOMBRE :");
+        jPanel5.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 30, -1, -1));
+
+        jLabel26.setText("REFERENCIA:");
+        jPanel5.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 70, -1, -1));
+        jPanel5.add(txtNombreL, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 30, 120, -1));
+
+        ComboBoxL1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboBoxL1ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(ComboBoxL1, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 110, 120, -1));
+
+        jLabel27.setText("UBICACIÓN:");
+        jPanel5.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 30, -1, -1));
+        jPanel5.add(txtUbicacionL, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 30, 110, -1));
+
+        jLabel28.setText("COLOR:");
+        jPanel5.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 180, -1, -1));
+        jPanel5.add(txtColorL, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 170, 90, -1));
+
         vtnVentanas.addTab("LOCUS", jPanel5);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 900, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 426, Short.MAX_VALUE)
+        );
+
+        vtnVentanas.addTab("MATERIALES", jPanel6);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -1381,6 +1772,67 @@ editarRegistro();
         // TODO add your handling code here:
     }//GEN-LAST:event_visorEstructurasMouseClicked
 
+    private void btnLimpiarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarLocusMouseMoved
+
+    private void btnLimpiarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarLocusMouseExited
+
+    private void btnLimpiarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarLocusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarLocusActionPerformed
+
+    private void btnEditarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarLocusMouseMoved
+
+    private void btnEditarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarLocusMouseExited
+
+    private void btnEditarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarLocusActionPerformed
+actualizarLocus();
+mostrarLocus();
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarLocusActionPerformed
+
+    private void btnRegistrarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrarLocusMouseMoved
+
+    private void btnRegistrarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrarLocusMouseExited
+
+    private void btnRegistrarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarLocusActionPerformed
+editarLocus();
+mostrarLocus();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrarLocusActionPerformed
+
+    private void btnEliminarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarLocusMouseMoved
+
+    private void btnEliminarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarLocusMouseExited
+
+    private void btnEliminarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarLocusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarLocusActionPerformed
+
+    private void visorLocusMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorLocusMouseClicked
+editarLocus();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_visorLocusMouseClicked
+
+    private void ComboBoxL1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxL1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboBoxL1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1420,18 +1872,23 @@ editarRegistro();
     private javax.swing.JComboBox<String> ComboBoxCarta;
     private javax.swing.JComboBox<String> ComboBoxCarta1;
     private javax.swing.JComboBox<String> ComboBoxE;
+    private javax.swing.JComboBox<String> ComboBoxL1;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEditar1;
+    private javax.swing.JButton btnEditarLocus;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnEliminar1;
+    private javax.swing.JButton btnEliminarLocus;
     private javax.swing.JPanel btnEstructuras;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnLimpiar1;
+    private javax.swing.JButton btnLimpiarLocus;
     private javax.swing.JPanel btnLocus;
     private javax.swing.JPanel btnLocus1;
     private javax.swing.JPanel btnLocus2;
     private javax.swing.JButton btnRegistrar;
     private javax.swing.JButton btnRegistrar1;
+    private javax.swing.JButton btnRegistrarLocus;
     private javax.swing.JPanel btnSitios;
     private javax.swing.JLabel casa;
     private javax.swing.JButton jButton4;
@@ -1450,6 +1907,12 @@ editarRegistro();
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1462,19 +1925,28 @@ editarRegistro();
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JTextField txtColorL;
     private javax.swing.JTextField txtCoordenadas;
     private javax.swing.JTextArea txtDescripcion;
     private javax.swing.JTextArea txtDescripcionE;
+    private javax.swing.JTextArea txtDescripcionL;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtNombreE;
+    private javax.swing.JTextField txtNombreL;
     private javax.swing.JTextField txtReferencia;
     private javax.swing.JTextField txtReferenciaE;
+    private javax.swing.JTextField txtReferenciaL;
+    private javax.swing.JTextField txtUbicacionL;
     public javax.swing.JTable visor;
     private javax.swing.JTable visorEstructuras;
+    private javax.swing.JTable visorLocus;
     private javax.swing.JTabbedPane vtnVentanas;
     // End of variables declaration//GEN-END:variables
 }
