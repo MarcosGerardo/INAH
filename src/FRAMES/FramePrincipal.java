@@ -32,9 +32,11 @@ public class FramePrincipal extends javax.swing.JFrame {
         mostrarEstructura("estructuras");
         Autocompleter(ComboBoxCarta);
         AutocompleterTwo(ComboBoxCarta1);
-        cargarSitios();
         mostrarLocus();
+        cargarSitios();
         cargarLocusCombo();
+        
+        btnLimpiar.setToolTipText("Limpiar formulario");btnEditar.setToolTipText("Editar formulario");btnRegistrar.setToolTipText("Registrar formulario");btnEliminar.setToolTipText("Borrar formulario");
     }
     //METODOSSITIOS
     //METODOPARAREGISTRAR UN NUEVO SITIO
@@ -159,8 +161,33 @@ public class FramePrincipal extends javax.swing.JFrame {
         }
     }
 }
+ private int obtenerClavePrimariaDelSitio(int filaSeleccionada) {
+    try {
+        Object valorCelda = visor.getValueAt(filaSeleccionada, 0);
+
+        if (valorCelda instanceof Integer) {
+            return (Integer) valorCelda;
+        } else if (valorCelda instanceof String) {
+            try {
+                return Integer.parseInt((String) valorCelda);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria del sitio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                throw new IllegalArgumentException("El valor en la celda no es una clave primaria válida.");
+            }
+        }
+    } catch (IndexOutOfBoundsException e) {
+        JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria del sitio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        throw new IllegalArgumentException("No se pudo obtener la clave primaria del sitio.");
+    }
+
+    JOptionPane.showMessageDialog(null, "No se pudo obtener la clave primaria del sitio.", "Error", JOptionPane.ERROR_MESSAGE);
+    throw new IllegalArgumentException("No se pudo obtener la clave primaria del sitio.");
+}
   public void llenarCamposDesdeTabla() {
     int filaSeleccionada = visor.getSelectedRow();
+    System.out.println(filaSeleccionada);
     if (filaSeleccionada == -1) {
         return;
     }
@@ -177,6 +204,60 @@ public class FramePrincipal extends javax.swing.JFrame {
     ComboBoxCarta.setSelectedItem(cartaTopografica); 
     ComboBoxCarta1.setSelectedItem(tipo); 
 }
+public void actualizarSitio() {
+    Connection conn = null;
+    PreparedStatement ps = null;
+
+    try {
+        CONECTOR cn = new CONECTOR();
+        conn = cn.getConexion();
+        int filaSeleccionada = visor.getSelectedRow();
+        int clavePrimaria = obtenerClavePrimariaDelSitio(filaSeleccionada);
+        System.out.println(clavePrimaria);
+        String nombre = txtNombre.getText();
+        String descripcion = txtDescripcion.getText();
+        String referencia = txtReferencia.getText();
+        String coordenadas = txtCoordenadas.getText();
+        Object cartaseleccionada = ComboBoxCarta.getSelectedItem();
+        Object tipoSeleccionado = ComboBoxCarta1.getSelectedItem();
+
+        if (tipoSeleccionado != null && cartaseleccionada != null && !nombre.isEmpty() && !descripcion.isEmpty() && !referencia.isEmpty() && !coordenadas.isEmpty()) {
+            String tipo = tipoSeleccionado.toString();
+            String carta = cartaseleccionada.toString();
+
+            String sql = "UPDATE sitios SET nombre = ?, descripcion = ?, referencia = ?, coordenadas = ?, CartaTopografica = ?, tipo = ? WHERE id = ?";
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, descripcion);
+            ps.setString(3, referencia);
+            ps.setString(4, coordenadas);
+            ps.setString(5, carta);
+            ps.setString(6, tipo);
+            ps.setInt(7, clavePrimaria);
+
+            int filasAfectadas = ps.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(null, "Los datos del sitio se han actualizado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("No se pudieron actualizar los datos del sitio.");
+                JOptionPane.showMessageDialog(null, "No se pudieron actualizar los datos del sitio.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, complete todos los campos obligatorios y seleccione un tipo antes de actualizar el sitio.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al actualizar el sitio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+       
+    }
+}
+private void mostrarMensajeSeleccionFila() {
+    JOptionPane.showMessageDialog(this, "Por favor, seleccione una fila en la tabla antes de continuar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+}
+
+
   public void eliminarRegistro() {
     int filaSeleccionada = visor.getSelectedRow();
      Connection conn = null;
@@ -764,25 +845,23 @@ private void actualizarLocus() {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        btnSitios = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        btnLocus = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        btnEstructuras = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        casa = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        btnLocus1 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
         btnLocus2 = new javax.swing.JPanel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
-        jLabel18 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
+        btnLocus1 = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        btnEstructuras = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        casa = new javax.swing.JLabel();
+        btnLocus = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        btnSitios = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         vtnVentanas = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -804,6 +883,7 @@ private void actualizarLocus() {
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
+        jLabel18 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         visorEstructuras = new javax.swing.JTable();
@@ -841,6 +921,7 @@ private void actualizarLocus() {
         jLabel28 = new javax.swing.JLabel();
         txtColorL = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -848,93 +929,101 @@ private void actualizarLocus() {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        btnSitios.setBackground(new java.awt.Color(96, 219, 164));
-        btnSitios.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnSitiosMouseMoved(evt);
+        jButton4.setBackground(new java.awt.Color(255, 102, 102));
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/salir.png"))); // NOI18N
+        jButton4.setText("SALIR");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
             }
         });
-        btnSitios.addMouseListener(new java.awt.event.MouseAdapter() {
+        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 430, -1, -1));
+
+        btnLocus2.setBackground(new java.awt.Color(96, 219, 164));
+        btnLocus2.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnLocus2MouseMoved(evt);
+            }
+        });
+        btnLocus2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnSitiosMouseClicked(evt);
+                btnLocus2MouseClicked(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnSitiosMouseExited(evt);
+                btnLocus2MouseExited(evt);
             }
         });
 
-        jLabel5.setText("SITIOS");
+        jLabel16.setText("MATERIALES");
 
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/Fatcow-Farm-Fresh-Egyptian-pyramid.32.png"))); // NOI18N
+        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/materiales.png"))); // NOI18N
 
-        javax.swing.GroupLayout btnSitiosLayout = new javax.swing.GroupLayout(btnSitios);
-        btnSitios.setLayout(btnSitiosLayout);
-        btnSitiosLayout.setHorizontalGroup(
-            btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnSitiosLayout.createSequentialGroup()
-                .addContainerGap(34, Short.MAX_VALUE)
-                .addComponent(jLabel7)
+        javax.swing.GroupLayout btnLocus2Layout = new javax.swing.GroupLayout(btnLocus2);
+        btnLocus2.setLayout(btnLocus2Layout);
+        btnLocus2Layout.setHorizontalGroup(
+            btnLocus2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel5)
-                .addGap(33, 33, 33))
-        );
-        btnSitiosLayout.setVerticalGroup(
-            btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(btnSitiosLayout.createSequentialGroup()
-                .addGroup(btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(btnSitiosLayout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addComponent(jLabel5))
-                    .addGroup(btnSitiosLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel7)))
-                .addContainerGap(12, Short.MAX_VALUE))
-        );
-
-        jPanel1.add(btnSitios, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 150, 50));
-
-        btnLocus.setBackground(new java.awt.Color(96, 219, 164));
-        btnLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnLocusMouseMoved(evt);
-            }
-        });
-        btnLocus.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnLocusMouseClicked(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLocusMouseExited(evt);
-            }
-        });
-
-        jLabel6.setText("LOCUS");
-
-        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/Cedarseed-British-Museum-Aztec-mask-of-Xiuhtecuhtli.48.png"))); // NOI18N
-
-        javax.swing.GroupLayout btnLocusLayout = new javax.swing.GroupLayout(btnLocus);
-        btnLocus.setLayout(btnLocusLayout);
-        btnLocusLayout.setHorizontalGroup(
-            btnLocusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocusLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
-                .addComponent(jLabel6)
+                .addComponent(jLabel16)
                 .addGap(26, 26, 26))
         );
-        btnLocusLayout.setVerticalGroup(
-            btnLocusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocusLayout.createSequentialGroup()
+        btnLocus2Layout.setVerticalGroup(
+            btnLocus2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus2Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addComponent(jLabel6)
+                .addComponent(jLabel16)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(btnLocusLayout.createSequentialGroup()
-                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(btnLocus2Layout.createSequentialGroup()
+                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 2, Short.MAX_VALUE))
         );
 
-        jPanel1.add(btnLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 150, 50));
+        jPanel1.add(btnLocus2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 150, 50));
+
+        btnLocus1.setBackground(new java.awt.Color(96, 219, 164));
+        btnLocus1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnLocus1MouseMoved(evt);
+            }
+        });
+        btnLocus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnLocus1MouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnLocus1MouseExited(evt);
+            }
+        });
+
+        jLabel14.setText("LOCUS");
+
+        jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/Cedarseed-British-Museum-Aztec-mask-of-Xiuhtecuhtli.48.png"))); // NOI18N
+
+        javax.swing.GroupLayout btnLocus1Layout = new javax.swing.GroupLayout(btnLocus1);
+        btnLocus1.setLayout(btnLocus1Layout);
+        btnLocus1Layout.setHorizontalGroup(
+            btnLocus1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus1Layout.createSequentialGroup()
+                .addContainerGap(21, Short.MAX_VALUE)
+                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel14)
+                .addGap(26, 26, 26))
+        );
+        btnLocus1Layout.setVerticalGroup(
+            btnLocus1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus1Layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(jLabel14)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(btnLocus1Layout.createSequentialGroup()
+                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 2, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(btnLocus1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 150, 50));
 
         btnEstructuras.setBackground(new java.awt.Color(96, 219, 164));
         btnEstructuras.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -983,114 +1072,103 @@ private void actualizarLocus() {
 
         jPanel1.add(btnEstructuras, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, 150, 50));
 
+        btnLocus.setBackground(new java.awt.Color(96, 219, 164));
+        btnLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnLocusMouseMoved(evt);
+            }
+        });
+        btnLocus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnLocusMouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnLocusMouseExited(evt);
+            }
+        });
+
+        jLabel6.setText("LOCUS");
+
+        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/Cedarseed-British-Museum-Aztec-mask-of-Xiuhtecuhtli.48.png"))); // NOI18N
+
+        javax.swing.GroupLayout btnLocusLayout = new javax.swing.GroupLayout(btnLocus);
+        btnLocus.setLayout(btnLocusLayout);
+        btnLocusLayout.setHorizontalGroup(
+            btnLocusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocusLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addComponent(jLabel6)
+                .addGap(26, 26, 26))
+        );
+        btnLocusLayout.setVerticalGroup(
+            btnLocusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocusLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(jLabel6)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(btnLocusLayout.createSequentialGroup()
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 2, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(btnLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 150, 50));
+
+        btnSitios.setBackground(new java.awt.Color(96, 219, 164));
+        btnSitios.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                btnSitiosMouseMoved(evt);
+            }
+        });
+        btnSitios.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnSitiosMouseClicked(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnSitiosMouseExited(evt);
+            }
+        });
+
+        jLabel5.setText("SITIOS");
+
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/Fatcow-Farm-Fresh-Egyptian-pyramid.32.png"))); // NOI18N
+
+        javax.swing.GroupLayout btnSitiosLayout = new javax.swing.GroupLayout(btnSitios);
+        btnSitios.setLayout(btnSitiosLayout);
+        btnSitiosLayout.setHorizontalGroup(
+            btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnSitiosLayout.createSequentialGroup()
+                .addContainerGap(34, Short.MAX_VALUE)
+                .addComponent(jLabel7)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel5)
+                .addGap(33, 33, 33))
+        );
+        btnSitiosLayout.setVerticalGroup(
+            btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(btnSitiosLayout.createSequentialGroup()
+                .addGroup(btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(btnSitiosLayout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jLabel5))
+                    .addGroup(btnSitiosLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel7)))
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(btnSitios, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 150, 50));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/inah.png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 210, 70));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 190, 70));
 
-        btnLocus1.setBackground(new java.awt.Color(96, 219, 164));
-        btnLocus1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnLocus1MouseMoved(evt);
-            }
-        });
-        btnLocus1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnLocus1MouseClicked(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLocus1MouseExited(evt);
-            }
-        });
+        vtnVentanas.setBackground(new java.awt.Color(255, 255, 255));
+        vtnVentanas.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        vtnVentanas.setForeground(new java.awt.Color(255, 255, 255));
 
-        jLabel14.setText("LOCUS");
-
-        jLabel15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/Cedarseed-British-Museum-Aztec-mask-of-Xiuhtecuhtli.48.png"))); // NOI18N
-
-        javax.swing.GroupLayout btnLocus1Layout = new javax.swing.GroupLayout(btnLocus1);
-        btnLocus1.setLayout(btnLocus1Layout);
-        btnLocus1Layout.setHorizontalGroup(
-            btnLocus1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus1Layout.createSequentialGroup()
-                .addContainerGap(21, Short.MAX_VALUE)
-                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel14)
-                .addGap(26, 26, 26))
-        );
-        btnLocus1Layout.setVerticalGroup(
-            btnLocus1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus1Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel14)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(btnLocus1Layout.createSequentialGroup()
-                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 2, Short.MAX_VALUE))
-        );
-
-        jPanel1.add(btnLocus1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 150, 50));
-
-        btnLocus2.setBackground(new java.awt.Color(96, 219, 164));
-        btnLocus2.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                btnLocus2MouseMoved(evt);
-            }
-        });
-        btnLocus2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnLocus2MouseClicked(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnLocus2MouseExited(evt);
-            }
-        });
-
-        jLabel16.setText("MATERIALES");
-
-        jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/materiales.png"))); // NOI18N
-
-        javax.swing.GroupLayout btnLocus2Layout = new javax.swing.GroupLayout(btnLocus2);
-        btnLocus2.setLayout(btnLocus2Layout);
-        btnLocus2Layout.setHorizontalGroup(
-            btnLocus2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel16)
-                .addGap(26, 26, 26))
-        );
-        btnLocus2Layout.setVerticalGroup(
-            btnLocus2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnLocus2Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel16)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(btnLocus2Layout.createSequentialGroup()
-                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 2, Short.MAX_VALUE))
-        );
-
-        jPanel1.add(btnLocus2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 150, 50));
-
-        jButton4.setBackground(new java.awt.Color(255, 102, 102));
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/salir.png"))); // NOI18N
-        jButton4.setText("SALIR");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 430, -1, -1));
-
-        jLabel18.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        jLabel18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/usermarcos.png"))); // NOI18N
-        jLabel18.setText("MARCOS");
-        jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 150, -1));
-
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setBackground(new java.awt.Color(96, 236, 251));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         visor.setModel(new javax.swing.table.DefaultTableModel(
@@ -1111,34 +1189,34 @@ private void actualizarLocus() {
         });
         jScrollPane1.setViewportView(visor);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 530, -1));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, -1));
 
         jLabel3.setText("NOMBRE:");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, -1, -1));
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 50, -1, -1));
 
         jLabel9.setText("DESCRIPCION:");
-        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 40, -1, -1));
+        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 90, -1, -1));
 
         jLabel10.setText("REFERENCIA:");
-        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, -1, -1));
+        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 210, -1, -1));
 
         jLabel11.setText("COORDENADAS:");
-        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 200, -1, -1));
+        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 250, -1, -1));
 
         jLabel12.setText("CARTA TOPOGRAFICA:");
-        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 240, -1, -1));
+        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 290, -1, -1));
 
         jLabel13.setText("TIPO:");
-        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 240, -1, -1));
-        jPanel3.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 10, 160, -1));
+        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 290, -1, -1));
+        jPanel3.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 50, 230, -1));
 
         txtDescripcion.setColumns(20);
         txtDescripcion.setRows(5);
         jScrollPane2.setViewportView(txtDescripcion);
 
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 40, -1, -1));
-        jPanel3.add(txtReferencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 160, 180, -1));
-        jPanel3.add(txtCoordenadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 200, 180, -1));
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 90, -1, -1));
+        jPanel3.add(txtReferencia, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 210, 180, -1));
+        jPanel3.add(txtCoordenadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 250, 180, -1));
 
         ComboBoxCarta.setForeground(new java.awt.Color(255, 204, 0));
         ComboBoxCarta.addActionListener(new java.awt.event.ActionListener() {
@@ -1146,8 +1224,8 @@ private void actualizarLocus() {
                 ComboBoxCartaActionPerformed(evt);
             }
         });
-        jPanel3.add(ComboBoxCarta, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 240, -1, -1));
-        jPanel3.add(ComboBoxCarta1, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 240, -1, -1));
+        jPanel3.add(ComboBoxCarta, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 290, -1, -1));
+        jPanel3.add(ComboBoxCarta1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 290, -1, -1));
 
         btnRegistrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
         btnRegistrar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -1165,7 +1243,7 @@ private void actualizarLocus() {
                 btnRegistrarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 280, -1, -1));
+        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 350, -1, -1));
 
         btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
         btnEditar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -1183,7 +1261,7 @@ private void actualizarLocus() {
                 btnEditarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 280, -1, -1));
+        jPanel3.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 350, -1, -1));
 
         btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/DELETE.png"))); // NOI18N
         btnEliminar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -1201,7 +1279,7 @@ private void actualizarLocus() {
                 btnEliminarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 280, -1, -1));
+        jPanel3.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 350, -1, -1));
 
         btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
         btnLimpiar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -1219,11 +1297,15 @@ private void actualizarLocus() {
                 btnLimpiarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 60));
+        jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 350, 60, 60));
+
+        jLabel18.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel18.setText("SITIOS");
+        jPanel3.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 20, -1, -1));
 
         vtnVentanas.addTab("SITIOS", jPanel3);
 
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setBackground(new java.awt.Color(78, 218, 254));
         jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         visorEstructuras.setModel(new javax.swing.table.DefaultTableModel(
@@ -1347,7 +1429,7 @@ private void actualizarLocus() {
 
         vtnVentanas.addTab("ESTRUCTURAS", jPanel4);
 
-        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setBackground(new java.awt.Color(96, 219, 164));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnLimpiarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
@@ -1479,33 +1561,38 @@ private void actualizarLocus() {
 
         vtnVentanas.addTab("LOCUS", jPanel5);
 
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 900, Short.MAX_VALUE)
+            .addGap(0, 884, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 426, Short.MAX_VALUE)
+            .addGap(0, 459, Short.MAX_VALUE)
         );
 
         vtnVentanas.addTab("MATERIALES", jPanel6);
+
+        jPanel1.add(vtnVentanas, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 890, 500));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(vtnVentanas, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGap(0, 890, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(vtnVentanas, javax.swing.GroupLayout.PREFERRED_SIZE, 461, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addGap(0, 410, Short.MAX_VALUE)
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 900, 410));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, 890, 410));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGES/vecteezy_abstract-gradient-background-with-green-and-blue-colors_6895305.jpg"))); // NOI18N
         jLabel2.setText("jLabel2");
@@ -1567,15 +1654,15 @@ vtnVentanas.setSelectedIndex(1);
     }//GEN-LAST:event_btnLocusMouseClicked
 
     private void btnLocus1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus1MouseMoved
-        // TODO add your handling code here:
+        btnLocus1.setBackground(new Color(255,255,255)); 
     }//GEN-LAST:event_btnLocus1MouseMoved
 
     private void btnLocus1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus1MouseClicked
-        // TODO add your handling code here:
+      vtnVentanas.setSelectedIndex(2);
     }//GEN-LAST:event_btnLocus1MouseClicked
 
     private void btnLocus1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus1MouseExited
-        // TODO add your handling code here:
+        btnLocus1.setBackground(new Color(96,219,164 ));
     }//GEN-LAST:event_btnLocus1MouseExited
 
     private void btnLocus2MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus2MouseMoved
@@ -1584,7 +1671,7 @@ btnLocus2   .setBackground(new Color(255,255,255));
     }//GEN-LAST:event_btnLocus2MouseMoved
 
     private void btnLocus2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus2MouseClicked
-        // TODO add your handling code here:
+        vtnVentanas.setSelectedIndex(3);
     }//GEN-LAST:event_btnLocus2MouseClicked
 
     private void btnLocus2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus2MouseExited
@@ -1603,7 +1690,7 @@ btnRegistrar.setToolTipText("REGISTRAR NUEVO SITIO");
         // Aquí llama a la función para insertar datos en la base de datos
         Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
          mostrar("sitios");
-         cargarSitios();
+        // cargarSitios();
           
         // TODO add your handling code here:
     }//GEN-LAST:event_btnRegistrarActionPerformed
@@ -1623,9 +1710,17 @@ int respuesta = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quie
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         btnEditar.setToolTipText("Modificar formulario");
-        editarRegistro();
-        mostrar("sitios");
-        cargarSitios();
+        ////
+         int filaSeleccionada = visor.getSelectedRow();
+    if (filaSeleccionada == -1) {
+        mostrarMensajeSeleccionFila();
+        return; // Detiene la ejecución del método si no hay una fila seleccionada
+    }
+
+    llenarCamposDesdeTabla(); // Llena los campos desde la tabla
+    actualizarSitio();
+    mostrar("sitios");
+       // cargarSitios();
 
     }//GEN-LAST:event_btnEditarActionPerformed
 
@@ -1633,12 +1728,12 @@ int respuesta = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quie
 btnEliminar.setToolTipText("Eliminar formulario");
  eliminarRegistro();
  mostrar("sitios");
-cargarSitios();
+//cargarSitios();
         // TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-btnLimpiar.setToolTipText("Limpiar formulario");
+
     txtNombre.setText("");
     txtDescripcion.setText("");
     txtReferencia.setText("");
