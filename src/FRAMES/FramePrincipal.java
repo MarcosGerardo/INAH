@@ -18,6 +18,16 @@ import java.sql.Statement;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import FRAMES.Materiales;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 public class FramePrincipal extends javax.swing.JFrame {
 
  
@@ -35,6 +45,8 @@ public class FramePrincipal extends javax.swing.JFrame {
         mostrarLocus();
         cargarSitios();
         cargarLocusCombo();
+        PanelLiticaPu.setVisible(false);
+    
         
         btnLimpiar.setToolTipText("Limpiar formulario");btnEditar.setToolTipText("Editar formulario");btnRegistrar.setToolTipText("Registrar formulario");btnEliminar.setToolTipText("Borrar formulario");
     }
@@ -839,6 +851,135 @@ private void actualizarLocus() {
  
     
 }
+    public static void MaterialNuevo() {
+        // Pregunta al usuario si desea trabajar con materiales
+        int deseaTrabajarConMateriales = JOptionPane.showConfirmDialog(null, "¿Desea trabajar con materiales nuevos?", "Pregunta", JOptionPane.YES_NO_OPTION);
+
+        if (deseaTrabajarConMateriales == JOptionPane.YES_OPTION) {
+            Connection conn;
+            CONECTOR cn = new CONECTOR();
+            conn = cn.getConexion();
+
+            String[] materiales = obtenerMaterialesDesdeBaseDeDatos(conn);
+
+            // Crear un JComboBox con los materiales
+            JComboBox<String> comboBox = new JComboBox<>(materiales);
+
+            // Configurar el JComboBox para que esté centrado y más grande
+            comboBox.setPreferredSize(new Dimension(400, 50));
+            comboBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // Crear botones "Aceptar" y "Cancelar"
+            JButton aceptarButton = new JButton("Aceptar");
+            JButton cancelarButton = new JButton("Cancelar");
+
+            // Crear un JFrame personalizado
+            JFrame customFrame = new JFrame("Selección de Material");
+            customFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            customFrame.setLayout(new BoxLayout(customFrame.getContentPane(), BoxLayout.Y_AXIS));
+
+            // Agregar el JComboBox al JFrame personalizado
+            customFrame.add(comboBox);
+
+            // Crear un JPanel para contener los botones y configurar el diseño en fila
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+            // Agregar los botones al JPanel de botones
+            buttonPanel.add(aceptarButton);
+            buttonPanel.add(cancelarButton);
+
+            // Agregar el JPanel de botones al JFrame personalizado
+            customFrame.add(buttonPanel);
+
+            // Agregar un ActionListener al botón "Aceptar" para manejar la selección del usuario
+            aceptarButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String selectedMaterial = (String) comboBox.getSelectedItem();
+                    if (selectedMaterial != null) {
+                        // Ejecutar el switch en base a la selección
+                        switch (selectedMaterial) {
+                            case "Ceramica":
+                                abrirFrameCeramica();
+                                break;
+                            case "Litica Tallada":
+                                abrirFrameLiticaTallada();
+                                break;
+                            case "Litica Pulida":
+                                abrirFrameLiticaPulida();
+                                PanelLiticaPu.setVisible(true);
+                                break;
+                            // Agregar casos para otros materiales aquí
+                        }
+                        // Cerrar el JFrame personalizado al hacer clic en "Aceptar"
+                        customFrame.dispose();
+                    }
+                }
+            });
+
+            // Agregar un ActionListener al botón "Cancelar" para cancelar la selección
+            cancelarButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Cerrar el JFrame personalizado al hacer clic en "Cancelar"
+                    customFrame.dispose();
+                }
+            });
+
+            // Centrar el JFrame en la pantalla
+            customFrame.pack();
+            customFrame.setLocationRelativeTo(null);
+
+            // Hacer visible el JFrame personalizado
+            customFrame.setVisible(true);
+        } else {
+            // Continuar con otras acciones si el usuario no desea trabajar con materiales
+        }
+    }
+
+    private static String[] obtenerMaterialesDesdeBaseDeDatos(Connection conn) {
+        String[] materiales = null;
+
+        try {
+            String query = "SELECT nombre_material FROM Materiales";
+            PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            ResultSet rs = statement.executeQuery();
+
+            rs.last();
+            int rowCount = rs.getRow();
+            materiales = new String[rowCount];
+
+            rs.beforeFirst();
+            int i = 0;
+            while (rs.next()) {
+                materiales[i] = rs.getString("nombre_material");
+                i++;
+            }
+
+            rs.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return materiales;
+    }
+
+
+    // Métodos para abrir frames específicos para cada material
+    private static void abrirFrameCeramica() {
+        // Lógica para abrir el frame de Ceramica
+    }
+
+    private static void abrirFrameLiticaTallada() {
+        // Lógica para abrir el frame de Litica Tallada
+    }
+
+ public static void abrirFrameLiticaPulida() {
+     
+    
+}
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -921,6 +1062,7 @@ private void actualizarLocus() {
         jLabel28 = new javax.swing.JLabel();
         txtColorL = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
+        PanelLiticaPu = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
@@ -1167,6 +1309,11 @@ private void actualizarLocus() {
         vtnVentanas.setBackground(new java.awt.Color(255, 255, 255));
         vtnVentanas.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         vtnVentanas.setForeground(new java.awt.Color(255, 255, 255));
+        vtnVentanas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vtnVentanasMouseClicked(evt);
+            }
+        });
 
         jPanel3.setBackground(new java.awt.Color(96, 236, 251));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1561,18 +1708,31 @@ private void actualizarLocus() {
 
         vtnVentanas.addTab("LOCUS", jPanel5);
 
-        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setBackground(new java.awt.Color(255, 102, 102));
         jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        PanelLiticaPu.setBackground(new java.awt.Color(255, 255, 153));
+
+        javax.swing.GroupLayout PanelLiticaPuLayout = new javax.swing.GroupLayout(PanelLiticaPu);
+        PanelLiticaPu.setLayout(PanelLiticaPuLayout);
+        PanelLiticaPuLayout.setHorizontalGroup(
+            PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 884, Short.MAX_VALUE)
+        );
+        PanelLiticaPuLayout.setVerticalGroup(
+            PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 459, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 884, Short.MAX_VALUE)
+            .addComponent(PanelLiticaPu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 459, Short.MAX_VALUE)
+            .addComponent(PanelLiticaPu, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         vtnVentanas.addTab("MATERIALES", jPanel6);
@@ -1671,6 +1831,7 @@ btnLocus2   .setBackground(new Color(255,255,255));
     }//GEN-LAST:event_btnLocus2MouseMoved
 
     private void btnLocus2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus2MouseClicked
+        MaterialNuevo();
         vtnVentanas.setSelectedIndex(3);
     }//GEN-LAST:event_btnLocus2MouseClicked
 
@@ -1678,26 +1839,6 @@ btnLocus2   .setBackground(new Color(255,255,255));
 btnLocus2.setBackground(new Color(96,219,164 ));
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLocus2MouseExited
-
-    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-btnRegistrar.setToolTipText("REGISTRAR NUEVO SITIO");
-        String nombre = txtNombre.getText();
-        String descripcion = txtDescripcion.getText();
-        String referencia = txtReferencia.getText();
-        String coordenadas = txtCoordenadas.getText();
-        String carta = ComboBoxCarta.getName();
-        String tipo = ComboBoxCarta1.getName();  
-        // Aquí llama a la función para insertar datos en la base de datos
-        Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
-         mostrar("sitios");
-        // cargarSitios();
-          
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrarActionPerformed
-
-    private void ComboBoxCartaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxCartaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ComboBoxCartaActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
 int respuesta = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quieres salir?", "Confirmación", JOptionPane.YES_NO_OPTION);
@@ -1708,225 +1849,247 @@ int respuesta = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quie
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        btnEditar.setToolTipText("Modificar formulario");
-        ////
-         int filaSeleccionada = visor.getSelectedRow();
-    if (filaSeleccionada == -1) {
-        mostrarMensajeSeleccionFila();
-        return; // Detiene la ejecución del método si no hay una fila seleccionada
-    }
+    private void vtnVentanasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vtnVentanasMouseClicked
+        if (vtnVentanas.getSelectedIndex() == 3) {
+           MaterialNuevo();
+          
+        }
+    }//GEN-LAST:event_vtnVentanasMouseClicked
 
-    llenarCamposDesdeTabla(); // Llena los campos desde la tabla
-    actualizarSitio();
-    mostrar("sitios");
-       // cargarSitios();
-
-    }//GEN-LAST:event_btnEditarActionPerformed
-
-    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-btnEliminar.setToolTipText("Eliminar formulario");
- eliminarRegistro();
- mostrar("sitios");
-//cargarSitios();
+    private void ComboBoxL1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxL1ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminarActionPerformed
+    }//GEN-LAST:event_ComboBoxL1ActionPerformed
+
+    private void visorLocusMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorLocusMouseClicked
+        editarLocus();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_visorLocusMouseClicked
+
+    private void btnEliminarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarLocusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarLocusActionPerformed
+
+    private void btnEliminarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarLocusMouseExited
+
+    private void btnEliminarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarLocusMouseMoved
+
+    private void btnRegistrarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarLocusActionPerformed
+        editarLocus();
+        mostrarLocus();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrarLocusActionPerformed
+
+    private void btnRegistrarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrarLocusMouseExited
+
+    private void btnRegistrarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrarLocusMouseMoved
+
+    private void btnEditarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarLocusActionPerformed
+        actualizarLocus();
+        mostrarLocus();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarLocusActionPerformed
+
+    private void btnEditarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarLocusMouseExited
+
+    private void btnEditarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditarLocusMouseMoved
+
+    private void btnLimpiarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarLocusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarLocusActionPerformed
+
+    private void btnLimpiarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarLocusMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarLocusMouseExited
+
+    private void btnLimpiarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarLocusMouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarLocusMouseMoved
+
+    private void ComboBoxEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxEActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboBoxEActionPerformed
+
+    private void btnEditar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditar1ActionPerformed
+        actualizarRegistro();
+        mostrarEstructura("estructuras");
+    }//GEN-LAST:event_btnEditar1ActionPerformed
+
+    private void btnEditar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditar1MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditar1MouseExited
+
+    private void btnEditar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditar1MouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEditar1MouseMoved
+
+    private void btnRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrar1ActionPerformed
+        registrarEstructura();
+        mostrarEstructura("estructuras");
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrar1ActionPerformed
+
+    private void btnRegistrar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrar1MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrar1MouseExited
+
+    private void btnRegistrar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrar1MouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegistrar1MouseMoved
+
+    private void btnLimpiar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar1ActionPerformed
+        limpiarCamposEstructura();
+        btnLimpiar1.setToolTipText("Limpiar formulario");
+        txtNombreE.setText("");
+        txtDescripcionE.setText("");
+        txtReferenciaE.setText("");
+        ComboBoxE.setSelectedIndex(0);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiar1ActionPerformed
+
+    private void btnLimpiar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiar1MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiar1MouseExited
+
+    private void btnLimpiar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiar1MouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiar1MouseMoved
+
+    private void btnEliminar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminar1ActionPerformed
+        int filaSeleccionada = visorEstructuras.getSelectedRow();
+
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione una fila antes de eliminar el registro.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            int opcion = JOptionPane.showConfirmDialog(null, "¿Seguro que desea eliminar el registro?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+
+            if (opcion == JOptionPane.YES_OPTION) {
+                eliminarRegistroEstrutura(); // Llama al método eliminarRegistro si el usuario confirma
+                mostrarEstructura("estructuras");
+            }
+        }
+    }//GEN-LAST:event_btnEliminar1ActionPerformed
+
+    private void btnEliminar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminar1MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminar1MouseExited
+
+    private void btnEliminar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminar1MouseMoved
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminar1MouseMoved
+
+    private void visorEstructurasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorEstructurasMouseClicked
+        editarRegistro();
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_visorEstructurasMouseClicked
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
 
-    txtNombre.setText("");
-    txtDescripcion.setText("");
-    txtReferencia.setText("");
-    txtCoordenadas.setText("");
-    ComboBoxCarta.setSelectedIndex(0);
-    ComboBoxCarta1.setSelectedIndex(0);
-
+        txtNombre.setText("");
+        txtDescripcion.setText("");
+        txtReferencia.setText("");
+        txtCoordenadas.setText("");
+        ComboBoxCarta.setSelectedIndex(0);
+        ComboBoxCarta1.setSelectedIndex(0);
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void btnLimpiarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarMouseExited
 
- btnLimpiar.setBackground(new Color(255,255,255)); 
+        btnLimpiar.setBackground(new Color(255,255,255));
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLimpiarMouseExited
 
     private void btnLimpiarMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarMouseMoved
-btnLimpiar.setBackground(new Color(96,219,164 ));
+        btnLimpiar.setBackground(new Color(96,219,164 ));
     }//GEN-LAST:event_btnLimpiarMouseMoved
 
-    private void btnRegistrarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarMouseExited
-       btnRegistrar.setBackground(new Color(255,255,255)); 
-    }//GEN-LAST:event_btnRegistrarMouseExited
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        btnEliminar.setToolTipText("Eliminar formulario");
+        eliminarRegistro();
+        mostrar("sitios");
+        //cargarSitios();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
-    private void btnRegistrarMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarMouseMoved
-      btnRegistrar.setBackground(new Color(96,219,164 ));
-    }//GEN-LAST:event_btnRegistrarMouseMoved
+    private void btnEliminarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseExited
+        btnEliminar.setBackground(new Color(255,255,255));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarMouseExited
+
+    private void btnEliminarMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseMoved
+        btnEliminar.setBackground(new Color(96,219,164 ));//
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnEliminarMouseMoved
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        btnEditar.setToolTipText("Modificar formulario");
+        ////
+        int filaSeleccionada = visor.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            mostrarMensajeSeleccionFila();
+            return; // Detiene la ejecución del método si no hay una fila seleccionada
+        }
+
+        llenarCamposDesdeTabla(); // Llena los campos desde la tabla
+        actualizarSitio();
+        mostrar("sitios");
+        // cargarSitios();
+    }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEditarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarMouseExited
-        btnEditar.setBackground(new Color(255,255,255)); 
+        btnEditar.setBackground(new Color(255,255,255));
     }//GEN-LAST:event_btnEditarMouseExited
 
     private void btnEditarMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarMouseMoved
         btnEditar.setBackground(new Color(96,219,164 ));// TODO add your handling code here:
     }//GEN-LAST:event_btnEditarMouseMoved
 
-    private void btnEliminarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseExited
-     btnEliminar.setBackground(new Color(255,255,255)); 
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminarMouseExited
-
-    private void btnEliminarMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseMoved
- btnEliminar.setBackground(new Color(96,219,164 ));//         
-// TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminarMouseMoved
-
-    private void btnEliminar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminar1MouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminar1MouseMoved
-
-    private void btnEliminar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminar1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminar1MouseExited
-
-    private void btnEliminar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminar1ActionPerformed
- int filaSeleccionada = visorEstructuras.getSelectedRow();
-    
-    if (filaSeleccionada == -1) {
-        JOptionPane.showMessageDialog(null, "Por favor, seleccione una fila antes de eliminar el registro.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
-    } else {
-        int opcion = JOptionPane.showConfirmDialog(null, "¿Seguro que desea eliminar el registro?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
-        
-        if (opcion == JOptionPane.YES_OPTION) {
-            eliminarRegistroEstrutura(); // Llama al método eliminarRegistro si el usuario confirma
-              mostrarEstructura("estructuras");
-        }
-    }      
-    }//GEN-LAST:event_btnEliminar1ActionPerformed
-
-    private void btnLimpiar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiar1MouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiar1MouseMoved
-
-    private void btnLimpiar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiar1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiar1MouseExited
-
-    private void btnLimpiar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar1ActionPerformed
-limpiarCamposEstructura();
-btnLimpiar1.setToolTipText("Limpiar formulario");
-    txtNombreE.setText("");
-    txtDescripcionE.setText("");
-    txtReferenciaE.setText("");
-    ComboBoxE.setSelectedIndex(0);
-   
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiar1ActionPerformed
-
-    private void btnRegistrar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrar1MouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrar1MouseMoved
-
-    private void btnRegistrar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrar1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrar1MouseExited
-
-    private void btnRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrar1ActionPerformed
-registrarEstructura(); 
- mostrarEstructura("estructuras");
-       
-     
-
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+        btnRegistrar.setToolTipText("REGISTRAR NUEVO SITIO");
+        String nombre = txtNombre.getText();
+        String descripcion = txtDescripcion.getText();
+        String referencia = txtReferencia.getText();
+        String coordenadas = txtCoordenadas.getText();
+        String carta = ComboBoxCarta.getName();
+        String tipo = ComboBoxCarta1.getName();
+        // Aquí llama a la función para insertar datos en la base de datos
+        Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
+        mostrar("sitios");
+        // cargarSitios();
 
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrar1ActionPerformed
+    }//GEN-LAST:event_btnRegistrarActionPerformed
 
-    private void btnEditar1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditar1MouseMoved
+    private void btnRegistrarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarMouseExited
+        btnRegistrar.setBackground(new Color(255,255,255));
+    }//GEN-LAST:event_btnRegistrarMouseExited
+
+    private void btnRegistrarMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarMouseMoved
+        btnRegistrar.setBackground(new Color(96,219,164 ));
+    }//GEN-LAST:event_btnRegistrarMouseMoved
+
+    private void ComboBoxCartaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxCartaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnEditar1MouseMoved
-
-    private void btnEditar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditar1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEditar1MouseExited
-
-    private void btnEditar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditar1ActionPerformed
-actualizarRegistro();
-mostrarEstructura("estructuras");
-    }//GEN-LAST:event_btnEditar1ActionPerformed
-
-    private void ComboBoxEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxEActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ComboBoxEActionPerformed
+    }//GEN-LAST:event_ComboBoxCartaActionPerformed
 
     private void visorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorMouseClicked
-llenarCamposDesdeTabla();
-// TODO add your handling code here:
+        llenarCamposDesdeTabla();
+        // TODO add your handling code here:
     }//GEN-LAST:event_visorMouseClicked
-
-    private void visorEstructurasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorEstructurasMouseClicked
-editarRegistro();
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_visorEstructurasMouseClicked
-
-    private void btnLimpiarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarLocusMouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiarLocusMouseMoved
-
-    private void btnLimpiarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLimpiarLocusMouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiarLocusMouseExited
-
-    private void btnLimpiarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarLocusActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiarLocusActionPerformed
-
-    private void btnEditarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEditarLocusMouseMoved
-
-    private void btnEditarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEditarLocusMouseExited
-
-    private void btnEditarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarLocusActionPerformed
-actualizarLocus();
-mostrarLocus();
-// TODO add your handling code here:
-    }//GEN-LAST:event_btnEditarLocusActionPerformed
-
-    private void btnRegistrarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarLocusMouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrarLocusMouseMoved
-
-    private void btnRegistrarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarLocusMouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrarLocusMouseExited
-
-    private void btnRegistrarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarLocusActionPerformed
-editarLocus();
-mostrarLocus();
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRegistrarLocusActionPerformed
-
-    private void btnEliminarLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarLocusMouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminarLocusMouseMoved
-
-    private void btnEliminarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarLocusMouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminarLocusMouseExited
-
-    private void btnEliminarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarLocusActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEliminarLocusActionPerformed
-
-    private void visorLocusMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorLocusMouseClicked
-editarLocus();
-        // TODO add your handling code here:
-    }//GEN-LAST:event_visorLocusMouseClicked
-
-    private void ComboBoxL1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxL1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ComboBoxL1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1968,6 +2131,7 @@ editarLocus();
     private javax.swing.JComboBox<String> ComboBoxCarta1;
     private javax.swing.JComboBox<String> ComboBoxE;
     private javax.swing.JComboBox<String> ComboBoxL1;
+    public static javax.swing.JPanel PanelLiticaPu;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEditar1;
     private javax.swing.JButton btnEditarLocus;
