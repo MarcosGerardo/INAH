@@ -8,8 +8,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -86,6 +88,41 @@ public class ceramicaMonocroma extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+ public void eliminarRegistroMonocroma() {
+    int filaSeleccionada = tablaCeramicaMonocroma.getSelectedRow();
+    Connection conn = null;
+    String SQL = "SELECT * FROM ceramicamonocroma";
+    Statement st;
+    CONECTOR con = new CONECTOR();
+    conn = con.getConexion();
+
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar.");
+        return; 
+    }
+
+    // Obtiene el ID del registro a eliminar
+    String id = tablaCeramicaMonocroma.getValueAt(filaSeleccionada, 0).toString();
+    String sqlDelete = "DELETE FROM ceramicamonocroma WHERE id=?";
+
+    try {
+        PreparedStatement preparedStatement = conn.prepareStatement(sqlDelete);
+        preparedStatement.setString(1, id);
+        int rowsAffected = preparedStatement.executeUpdate();
+
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Registro eliminado exitosamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro.");
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
+        e.toString();
+        System.out.print(e.toString());
+    }
+}
+
  
  
 
@@ -119,8 +156,18 @@ public class ceramicaMonocroma extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tablaCeramicaMonocroma);
 
         jButton1.setText("ELIMINAR");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("jButton2");
+        jButton2.setText("REGRESAR");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -151,6 +198,17 @@ public class ceramicaMonocroma extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+this.setVisible(false);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+eliminarRegistroMonocroma();
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
