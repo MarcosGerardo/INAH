@@ -1126,6 +1126,90 @@ private void cargarLocusCombo() {
         }
     }
 }
+   private void registrarLiticapulida() {
+    Connection conn = null;
+    PreparedStatement ps = null;
+    
+    try {
+        CONECTOR cn = new CONECTOR();
+        conn = cn.getConexion();
+        
+        String sitio = cbSitio3.getSelectedItem().toString();
+        String numeroBolsa = nobolsa.getText();
+        String estructura = cbEstructura3.getSelectedItem().toString();
+        String cuarto = cbLocus3.getSelectedItem().toString();
+        String e = EE.getText();
+        String n = NN.getText();
+        String completo = COMPLETADO.getText();
+        String fracturado = FRACTURADO.getText();
+        String metate = METATE.getText();
+        String mortero = MORTERO.getText();
+        String mano_metate = MMETATE.getText();
+        String mano_mortero = MMORTERO.getText();
+        String pulidor = PULIDOR.getText();
+        String hacha = HACHA.getText();
+        String otro = OTRO.getText();
+        String materia_prima = MATERIA.getText();
+        String caras_pulidas = CARAS.getText();
+        String largo = LARGO.getText();
+        String ancho = ANCHO.getText();
+        String grosor = GROSOR.getText();
+        String registro = REGIS.getText();
+        String analizo = ANA.getText();
+        String observaciones = OBSERVACIONES.getText();
+
+        String sql = "INSERT INTO liticapulida (Sito, Numero_de_bolsa, Estructura, Locus, E, N, Completo, Fracturado, Metate, Mortero, Mano_metate, Mano_Mortero, Pulidor, Hacha, Otro, Materia_Prima, Caras_pulidas, Largo, Ancho, Grosor, Registro, Analizo, Observaciones) VALUES "
+               + " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        ps = conn.prepareStatement(sql);
+        ps.setString(1, sitio);
+        ps.setString(2, numeroBolsa);
+        ps.setString(3, estructura);
+        ps.setString(4, cuarto);
+        ps.setString(5, e);
+        ps.setString(6, n);
+        ps.setString(7, completo);
+        ps.setString(8, fracturado);
+        ps.setString(9, metate);
+        ps.setString(10, mortero);
+        ps.setString(11, mano_metate);
+        ps.setString(12, mano_mortero);
+        ps.setString(13, pulidor);
+        ps.setString(14, hacha);
+        ps.setString(15, otro);
+        ps.setString(16, materia_prima);
+        ps.setString(17, caras_pulidas);
+        ps.setString(18, largo);
+        ps.setString(19, ancho);
+        ps.setString(20, grosor);
+        ps.setString(21, registro);
+        ps.setString(22, analizo);
+        ps.setString(23, observaciones);
+
+        int filasAfectadas = ps.executeUpdate();
+
+        if (filasAfectadas > 0) {
+            JOptionPane.showMessageDialog(null, "Los datos se han insertado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudieron insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al registrar la estructura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        System.err.println(e.toString());
+    } finally {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
 
 
 
@@ -1513,7 +1597,7 @@ private void cargarLocusCombo() {
         jLabel113 = new javax.swing.JLabel();
         txtReg = new javax.swing.JTextField();
         txtAnali = new javax.swing.JTextField();
-        jButton6 = new javax.swing.JButton();
+        btnConsul = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         PanelLiticaTa = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
@@ -1575,16 +1659,59 @@ private void cargarLocusCombo() {
         jLabel40 = new javax.swing.JLabel();
         cbEstructura3 = new javax.swing.JComboBox<>();
         cbLocus3 = new javax.swing.JComboBox<>();
-        jLabel44 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        nobolsa = new javax.swing.JTextField();
+        jLabel87 = new javax.swing.JLabel();
+        jLabel137 = new javax.swing.JLabel();
+        jLabel138 = new javax.swing.JLabel();
+        jLabel139 = new javax.swing.JLabel();
+        jLabel44 = new javax.swing.JLabel();
+        jLabel37 = new javax.swing.JLabel();
+        jLabel61 = new javax.swing.JLabel();
+        EE = new javax.swing.JTextField();
+        NN = new javax.swing.JTextField();
+        jLabel63 = new javax.swing.JLabel();
+        COMPLETADO = new javax.swing.JTextField();
+        jLabel70 = new javax.swing.JLabel();
+        FRACTURADO = new javax.swing.JTextField();
+        jLabel141 = new javax.swing.JLabel();
+        jLabel142 = new javax.swing.JLabel();
+        jLabel143 = new javax.swing.JLabel();
+        METATE = new javax.swing.JTextField();
+        MORTERO = new javax.swing.JTextField();
+        MMETATE = new javax.swing.JTextField();
+        MMORTERO = new javax.swing.JTextField();
+        HACHA = new javax.swing.JTextField();
+        OTRO = new javax.swing.JTextField();
+        MATERIA = new javax.swing.JTextField();
+        jLabel144 = new javax.swing.JLabel();
+        jLabel145 = new javax.swing.JLabel();
+        jLabel146 = new javax.swing.JLabel();
+        jLabel147 = new javax.swing.JLabel();
+        LARGO = new javax.swing.JTextField();
+        ANCHO = new javax.swing.JTextField();
+        GROSOR = new javax.swing.JTextField();
+        CARAS = new javax.swing.JTextField();
+        jLabel148 = new javax.swing.JLabel();
+        jLabel149 = new javax.swing.JLabel();
+        REGIS = new javax.swing.JTextField();
+        ANA = new javax.swing.JTextField();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        OBSERVACIONES = new javax.swing.JTextArea();
+        jLabel150 = new javax.swing.JLabel();
+        jButton6 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jLabel140 = new javax.swing.JLabel();
+        PULIDOR = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 183, 164));
 
+        jPanel1.setBackground(new java.awt.Color(176, 142, 107));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton4.setBackground(new java.awt.Color(255, 102, 102));
+        jButton4.setBackground(new java.awt.Color(100, 124, 108));
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/salir.png"))); // NOI18N
         jButton4.setText("SALIR");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -1594,7 +1721,7 @@ private void cargarLocusCombo() {
         });
         jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 430, -1, -1));
 
-        btnLocus2.setBackground(new java.awt.Color(96, 219, 164));
+        btnLocus2.setBackground(new java.awt.Color(232, 195, 158));
         btnLocus2.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 btnLocus2MouseMoved(evt);
@@ -1611,6 +1738,7 @@ private void cargarLocusCombo() {
 
         jLabel16.setText("MATERIALES");
 
+        jLabel17.setBackground(new java.awt.Color(232, 195, 158));
         jLabel17.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/materiales.png"))); // NOI18N
 
         javax.swing.GroupLayout btnLocus2Layout = new javax.swing.GroupLayout(btnLocus2);
@@ -1637,7 +1765,7 @@ private void cargarLocusCombo() {
 
         jPanel1.add(btnLocus2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 150, 50));
 
-        btnLocus1.setBackground(new java.awt.Color(96, 219, 164));
+        btnLocus1.setBackground(new java.awt.Color(232, 195, 158));
         btnLocus1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 btnLocus1MouseMoved(evt);
@@ -1680,7 +1808,7 @@ private void cargarLocusCombo() {
 
         jPanel1.add(btnLocus1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 150, 50));
 
-        btnEstructuras.setBackground(new java.awt.Color(96, 219, 164));
+        btnEstructuras.setBackground(new java.awt.Color(232, 195, 158));
         btnEstructuras.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 btnEstructurasMouseMoved(evt);
@@ -1770,7 +1898,7 @@ private void cargarLocusCombo() {
 
         jPanel1.add(btnLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 150, 50));
 
-        btnSitios.setBackground(new java.awt.Color(96, 219, 164));
+        btnSitios.setBackground(new java.awt.Color(232, 195, 158));
         btnSitios.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
                 btnSitiosMouseMoved(evt);
@@ -1819,6 +1947,7 @@ private void cargarLocusCombo() {
         jLabel1.setText("jLabel1");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 190, 70));
 
+        vtnVentanas.setBackground(new java.awt.Color(245, 225, 206));
         vtnVentanas.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         vtnVentanas.setForeground(new java.awt.Color(255, 255, 255));
         vtnVentanas.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1827,7 +1956,7 @@ private void cargarLocusCombo() {
             }
         });
 
-        jPanel3.setBackground(new java.awt.Color(96, 236, 251));
+        jPanel3.setBackground(new java.awt.Color(245, 225, 206));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         visor.setModel(new javax.swing.table.DefaultTableModel(
@@ -1964,7 +2093,7 @@ private void cargarLocusCombo() {
 
         vtnVentanas.addTab("SITIOS", jPanel3);
 
-        jPanel4.setBackground(new java.awt.Color(78, 218, 254));
+        jPanel4.setBackground(new java.awt.Color(245, 225, 206));
         jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         visorEstructuras.setModel(new javax.swing.table.DefaultTableModel(
@@ -2088,7 +2217,7 @@ private void cargarLocusCombo() {
 
         vtnVentanas.addTab("ESTRUCTURAS", jPanel4);
 
-        jPanel5.setBackground(new java.awt.Color(96, 219, 164));
+        jPanel5.setBackground(new java.awt.Color(245, 225, 206));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnLimpiarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
@@ -2221,6 +2350,8 @@ private void cargarLocusCombo() {
         vtnVentanas.addTab("LOCUS", jPanel5);
 
         Contenedor.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        PanellCeramica.setBackground(new java.awt.Color(245, 225, 206));
 
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 102)));
         jPanel6.setForeground(new java.awt.Color(0, 102, 102));
@@ -2706,6 +2837,7 @@ private void cargarLocusCombo() {
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
 
+        PanelCeramicaDetallada.setBackground(new java.awt.Color(245, 225, 206));
         PanelCeramicaDetallada.setPreferredSize(new java.awt.Dimension(872, 447));
 
         jLabel42.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -3199,7 +3331,12 @@ private void cargarLocusCombo() {
                 .addContainerGap(50, Short.MAX_VALUE))
         );
 
-        jButton6.setText("CONSULTAR");
+        btnConsul.setText("CONSULTAR");
+        btnConsul.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsulActionPerformed(evt);
+            }
+        });
 
         jButton7.setText("REGISTRAR");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -3236,7 +3373,7 @@ private void cargarLocusCombo() {
                                 .addGap(46, 46, 46)
                                 .addComponent(jButton7)
                                 .addGap(18, 18, 18)
-                                .addComponent(jButton6))))
+                                .addComponent(btnConsul))))
                     .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
                         .addGap(35, 35, 35)
                         .addComponent(jLabel98)))
@@ -3266,7 +3403,7 @@ private void cargarLocusCombo() {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                             .addComponent(jButton7)
-                                            .addComponent(jButton6)))))
+                                            .addComponent(btnConsul)))))
                             .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3275,6 +3412,8 @@ private void cargarLocusCombo() {
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
+
+        PanelLiticaTa.setBackground(new java.awt.Color(245, 225, 206));
 
         jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
 
@@ -3670,7 +3809,10 @@ private void cargarLocusCombo() {
                     .addContainerGap(266, Short.MAX_VALUE)))
         );
 
+        PanelLiticaPu.setBackground(new java.awt.Color(245, 225, 206));
         PanelLiticaPu.setPreferredSize(new java.awt.Dimension(872, 447));
+
+        jPanel9.setBackground(new java.awt.Color(245, 225, 206));
 
         jLabel38.setText("Sitio:");
 
@@ -3678,13 +3820,23 @@ private void cargarLocusCombo() {
 
         jLabel40.setText("Locus:");
 
+        jLabel2.setText("Numero de bolsa");
+
+        jLabel87.setText("METATE:");
+
+        jLabel137.setText("MORTERO:");
+
+        jLabel138.setText("MANO DE METATE:");
+
+        jLabel139.setText("MANO DE MORTERO");
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addComponent(jLabel38)
                         .addGap(47, 47, 47)
@@ -3696,8 +3848,18 @@ private void cargarLocusCombo() {
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addComponent(jLabel39)
                         .addGap(18, 18, 18)
-                        .addComponent(cbEstructura3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                        .addComponent(cbEstructura3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(nobolsa, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel87)
+                    .addComponent(jLabel137)
+                    .addComponent(jLabel138)
+                    .addComponent(jLabel139))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3705,41 +3867,279 @@ private void cargarLocusCombo() {
                 .addGap(16, 16, 16)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbSitio3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel38))
+                    .addComponent(jLabel38)
+                    .addComponent(jLabel87))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel39)
-                    .addComponent(cbEstructura3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbEstructura3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel137))
                 .addGap(6, 6, 6)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel40)
-                    .addComponent(cbLocus3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                    .addComponent(cbLocus3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel138))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGap(0, 16, Short.MAX_VALUE)
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(nobolsa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel139)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         jLabel44.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel44.setText("LITICA PULIDA");
+
+        jLabel37.setText("E:");
+
+        jLabel61.setText("N:");
+
+        jLabel63.setText("COMPLETADO:");
+
+        jLabel70.setText("FRACTURADO:");
+
+        jLabel141.setText("HACHA:");
+
+        jLabel142.setText("OTRO:");
+
+        jLabel143.setText("MATERIA PRIMA:");
+
+        jLabel144.setText("CARAS PULIDAS:");
+
+        jLabel145.setText("LARGO MAX (CM):");
+
+        jLabel146.setText("ANCHOR MAX (CM):");
+
+        jLabel147.setText("GROSOR MAX (CM):");
+
+        jLabel148.setText("REGISTRÓ:");
+
+        jLabel149.setText("ANALIZÓ");
+
+        OBSERVACIONES.setColumns(20);
+        OBSERVACIONES.setRows(5);
+        jScrollPane8.setViewportView(OBSERVACIONES);
+
+        jLabel150.setText("OBSERVACIONES:");
+
+        jButton6.setText("REGISTRAR");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        jButton8.setText("CONSULTAR");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
+        jLabel140.setText("PULIDOR:");
 
         javax.swing.GroupLayout PanelLiticaPuLayout = new javax.swing.GroupLayout(PanelLiticaPu);
         PanelLiticaPu.setLayout(PanelLiticaPuLayout);
         PanelLiticaPuLayout.setHorizontalGroup(
             PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelLiticaPuLayout.createSequentialGroup()
-                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 680, Short.MAX_VALUE))
-            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
-                .addGap(357, 357, 357)
-                .addComponent(jLabel44)
-                .addContainerGap(388, Short.MAX_VALUE))
+                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addGap(357, 357, 357)
+                        .addComponent(jLabel44))
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addComponent(jLabel70)
+                                .addGap(18, 18, 18)
+                                .addComponent(FRACTURADO, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addComponent(jLabel63)
+                                .addGap(18, 18, 18)
+                                .addComponent(COMPLETADO, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton6))
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addGap(64, 64, 64)
+                                .addComponent(jLabel143)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(MATERIA, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton8)
+                .addGap(130, 130, 130))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelLiticaPuLayout.createSequentialGroup()
+                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(METATE, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                            .addComponent(MORTERO)
+                            .addComponent(MMETATE)
+                            .addComponent(MMORTERO)))
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel37)
+                            .addComponent(jLabel61))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(EE, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(NN, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(187, 187, 187)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addComponent(jLabel140)
+                                .addGap(18, 18, 18)
+                                .addComponent(PULIDOR, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel141)
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(jLabel142)))
+                                .addGap(24, 24, 24)
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(HACHA, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(OTRO, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addComponent(jLabel147)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(GROSOR, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelLiticaPuLayout.createSequentialGroup()
+                                        .addComponent(jLabel144)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(CARAS, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addComponent(jLabel146)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(ANCHO, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addComponent(jLabel145)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(LARGO, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addComponent(jLabel148)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(REGIS, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addComponent(jLabel149)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(ANA, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelLiticaPuLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel150)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(17, 17, 17))))
         );
         PanelLiticaPuLayout.setVerticalGroup(
             PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelLiticaPuLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addComponent(jLabel44)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(277, Short.MAX_VALUE))
+                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(METATE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel144)
+                            .addComponent(CARAS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel148)
+                            .addComponent(REGIS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(MORTERO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel145)
+                            .addComponent(LARGO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel149)
+                            .addComponent(ANA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(MMETATE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel146))
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addGap(14, 14, 14)
+                                        .addComponent(MMORTERO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(jLabel147)
+                                            .addComponent(GROSOR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(ANCHO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel37)
+                            .addComponent(EE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel61)
+                            .addComponent(NN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(51, 51, 51)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel63)
+                            .addComponent(COMPLETADO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel70)
+                            .addComponent(FRACTURADO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(92, Short.MAX_VALUE))
+                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addComponent(jLabel150)
+                                        .addGap(49, 49, 49)
+                                        .addComponent(OTRO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                .addGap(3, 3, 3)
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel140)
+                                    .addComponent(PULIDOR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel141)
+                                    .addComponent(HACHA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel142)))
+                        .addGap(18, 18, 18)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel143)
+                            .addComponent(MATERIA, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton6)
+                            .addComponent(jButton8))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout ContenedorLayout = new javax.swing.GroupLayout(Contenedor);
@@ -3764,7 +4164,7 @@ private void cargarLocusCombo() {
                 .addGroup(ContenedorLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(PanelLiticaPu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addContainerGap(27, Short.MAX_VALUE)))
         );
         ContenedorLayout.setVerticalGroup(
             ContenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3808,10 +4208,6 @@ private void cargarLocusCombo() {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, 890, 410));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IMAGES/vecteezy_abstract-gradient-background-with-green-and-blue-colors_6895305.jpg"))); // NOI18N
-        jLabel2.setText("jLabel2");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-9, 0, 2010, 1080));
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -3832,7 +4228,7 @@ private void cargarLocusCombo() {
     }//GEN-LAST:event_btnSitiosMouseMoved
 
     private void btnSitiosMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSitiosMouseExited
-btnSitios.setBackground(new Color(96,219,164 ));       // TODO add your handling code here:
+btnSitios.setBackground(new Color(232,195,158));       // TODO add your handling code here:
     }//GEN-LAST:event_btnSitiosMouseExited
 
     private void btnEstructurasMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEstructurasMouseMoved
@@ -3840,7 +4236,7 @@ btnEstructuras.setBackground(new Color(255,255,255));        // TODO add your ha
     }//GEN-LAST:event_btnEstructurasMouseMoved
 
     private void btnEstructurasMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEstructurasMouseExited
-      btnEstructuras.setBackground(new Color(96,219,164 ));      // TODO add your handling code here:
+      btnEstructuras.setBackground(new Color(232,195,158 ));      // TODO add your handling code here:
     }//GEN-LAST:event_btnEstructurasMouseExited
 
     private void btnLocusMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocusMouseMoved
@@ -3849,7 +4245,7 @@ btnLocus.setBackground(new Color(255,255,255));
     }//GEN-LAST:event_btnLocusMouseMoved
 
     private void btnLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocusMouseExited
-       btnLocus.setBackground(new Color(96,219,164 ));   
+       btnLocus.setBackground(new Color(232,195,158 ));   
        // TODO add your handling code here:
     }//GEN-LAST:event_btnLocusMouseExited
 
@@ -3876,7 +4272,7 @@ vtnVentanas.setSelectedIndex(1);
     }//GEN-LAST:event_btnLocus1MouseClicked
 
     private void btnLocus1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus1MouseExited
-        btnLocus1.setBackground(new Color(96,219,164 ));
+        btnLocus1.setBackground(new Color(232,195,158));
     }//GEN-LAST:event_btnLocus1MouseExited
 
     private void btnLocus2MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus2MouseMoved
@@ -3890,7 +4286,7 @@ btnLocus2   .setBackground(new Color(255,255,255));
     }//GEN-LAST:event_btnLocus2MouseClicked
 
     private void btnLocus2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLocus2MouseExited
-btnLocus2.setBackground(new Color(96,219,164 ));
+btnLocus2.setBackground(new Color(232,195,158 ));
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLocus2MouseExited
 
@@ -4176,6 +4572,26 @@ registrarCeramicaDecorada();
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void btnConsulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsulActionPerformed
+ceramicaDecorada cer = new ceramicaDecorada();
+cer.mostrarCeramicaDecorada();
+cer.setVisible(true);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnConsulActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+registrarLiticapulida();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+liticapulida pu=new liticapulida();
+pu.mostrarLiticapulida();
+pu.setVisible(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton8ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -4212,15 +4628,35 @@ registrarCeramicaDecorada();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField ANA;
+    private javax.swing.JTextField ANCHO;
+    private javax.swing.JTextField CARAS;
+    private javax.swing.JTextField COMPLETADO;
     private javax.swing.JComboBox<String> ComboBoxCarta;
     private javax.swing.JComboBox<String> ComboBoxCarta1;
     private javax.swing.JComboBox<String> ComboBoxE;
     private javax.swing.JComboBox<String> ComboBoxL1;
     public static javax.swing.JPanel Contenedor;
+    private javax.swing.JTextField EE;
+    private javax.swing.JTextField FRACTURADO;
+    private javax.swing.JTextField GROSOR;
+    private javax.swing.JTextField HACHA;
+    private javax.swing.JTextField LARGO;
+    private javax.swing.JTextField MATERIA;
+    private javax.swing.JTextField METATE;
+    private javax.swing.JTextField MMETATE;
+    private javax.swing.JTextField MMORTERO;
+    private javax.swing.JTextField MORTERO;
+    private javax.swing.JTextField NN;
+    private javax.swing.JTextArea OBSERVACIONES;
+    private javax.swing.JTextField OTRO;
+    private javax.swing.JTextField PULIDOR;
     public static javax.swing.JPanel PanelCeramicaDetallada;
     public static javax.swing.JPanel PanelLiticaPu;
     public static javax.swing.JPanel PanelLiticaTa;
     public static javax.swing.JPanel PanellCeramica;
+    private javax.swing.JTextField REGIS;
+    private javax.swing.JButton btnConsul;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEditar1;
     private javax.swing.JButton btnEditarLocus;
@@ -4258,6 +4694,7 @@ registrarCeramicaDecorada();
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -4301,8 +4738,22 @@ registrarCeramicaDecorada();
     private javax.swing.JLabel jLabel134;
     private javax.swing.JLabel jLabel135;
     private javax.swing.JLabel jLabel136;
+    private javax.swing.JLabel jLabel137;
+    private javax.swing.JLabel jLabel138;
+    private javax.swing.JLabel jLabel139;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel140;
+    private javax.swing.JLabel jLabel141;
+    private javax.swing.JLabel jLabel142;
+    private javax.swing.JLabel jLabel143;
+    private javax.swing.JLabel jLabel144;
+    private javax.swing.JLabel jLabel145;
+    private javax.swing.JLabel jLabel146;
+    private javax.swing.JLabel jLabel147;
+    private javax.swing.JLabel jLabel148;
+    private javax.swing.JLabel jLabel149;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel150;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
@@ -4326,6 +4777,7 @@ registrarCeramicaDecorada();
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
@@ -4352,7 +4804,9 @@ registrarCeramicaDecorada();
     private javax.swing.JLabel jLabel59;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel60;
+    private javax.swing.JLabel jLabel61;
     private javax.swing.JLabel jLabel62;
+    private javax.swing.JLabel jLabel63;
     private javax.swing.JLabel jLabel64;
     private javax.swing.JLabel jLabel65;
     private javax.swing.JLabel jLabel66;
@@ -4360,6 +4814,7 @@ registrarCeramicaDecorada();
     private javax.swing.JLabel jLabel68;
     private javax.swing.JLabel jLabel69;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel70;
     private javax.swing.JLabel jLabel71;
     private javax.swing.JLabel jLabel72;
     private javax.swing.JLabel jLabel73;
@@ -4377,6 +4832,7 @@ registrarCeramicaDecorada();
     private javax.swing.JLabel jLabel84;
     private javax.swing.JLabel jLabel85;
     private javax.swing.JLabel jLabel86;
+    private javax.swing.JLabel jLabel87;
     private javax.swing.JLabel jLabel88;
     private javax.swing.JLabel jLabel89;
     private javax.swing.JLabel jLabel9;
@@ -4421,6 +4877,7 @@ registrarCeramicaDecorada();
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField67;
     private javax.swing.JTextField jTextField68;
@@ -4438,6 +4895,7 @@ registrarCeramicaDecorada();
     private javax.swing.JTextField jTextField81;
     private javax.swing.JTextField jTextField82;
     private javax.swing.JTextField jTextField83;
+    private javax.swing.JTextField nobolsa;
     private javax.swing.JTextField txtAmaro;
     private javax.swing.JTextField txtAnali;
     private javax.swing.JTextField txtAnalizo;
