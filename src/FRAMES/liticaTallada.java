@@ -161,6 +161,7 @@ this.setVisible(false);
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 eliminarRegistro();
+mostrarLiticatallada();
         // TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
 

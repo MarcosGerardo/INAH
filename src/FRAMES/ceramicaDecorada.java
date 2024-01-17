@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -53,6 +54,40 @@ public void mostrarCeramicaDecorada() {
         e.printStackTrace();
     }
 }
+public void eliminarRegistroDetallada() {
+    int filaSeleccionada = tbDetallada.getSelectedRow();
+    Connection conn = null;
+    String SQL = "SELECT * FROM ceramicadecorada";
+    Statement st;
+    CONECTOR con = new CONECTOR();
+    conn = con.getConexion();
+
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar.");
+        return; 
+    }
+
+    // Obtiene el ID del registro a eliminar
+    String id = tbDetallada.getValueAt(filaSeleccionada, 0).toString();
+    String sqlDelete = "DELETE FROM ceramicadecorada WHERE id=?";
+
+    try {
+        java.sql.PreparedStatement preparedStatement = conn.prepareStatement(sqlDelete);
+        preparedStatement.setString(1, id);
+        int rowsAffected = preparedStatement.executeUpdate();
+
+        if (rowsAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Registro eliminado exitosamente.");
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro.");
+        }
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
+        e.toString();
+        System.out.print(e.toString());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -64,6 +99,8 @@ public void mostrarCeramicaDecorada() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tbDetallada = new javax.swing.JTable();
+        btnEliminar = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -80,6 +117,20 @@ public void mostrarCeramicaDecorada() {
         ));
         jScrollPane1.setViewportView(tbDetallada);
 
+        btnEliminar.setText("ELIMINAR");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("REGRESAR");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -88,17 +139,36 @@ public void mostrarCeramicaDecorada() {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1104, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEliminar)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2)
+                .addGap(35, 35, 35))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnEliminar)
+                    .addComponent(jButton2))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+       eliminarRegistroDetallada();
+       mostrarCeramicaDecorada();
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -136,6 +206,8 @@ public void mostrarCeramicaDecorada() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tbDetallada;
     // End of variables declaration//GEN-END:variables

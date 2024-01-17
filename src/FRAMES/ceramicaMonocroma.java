@@ -29,65 +29,66 @@ public class ceramicaMonocroma extends javax.swing.JFrame {
     }
  
 
+public void mostrar() {
+    Connection conn = null;
+    String SQL = "SELECT * FROM ceramicamonocroma";
+    Statement st;
+    CONECTOR con = new CONECTOR();
+    conn = con.getConexion();
+    DefaultTableModel model = new DefaultTableModel();
 
- public void mostrar() {
-        Connection conn = null;
-        String SQL = "SELECT * FROM ceramicamonocroma " ;
-        Statement st;
-        CONECTOR con = new CONECTOR();
-        conn = con.getConexion();
-        DefaultTableModel model = new DefaultTableModel();
-        
-        // Agrega las columnas que deseas mostrar en la tabla
-        model.addColumn("Sitio");
-        model.addColumn("Numero_de_bolsa");
-        model.addColumn("Unidad");
-        model.addColumn("Estructura");
-        model.addColumn("Cuarto");
-        model.addColumn("E");
-        model.addColumn("N");
-        model.addColumn("RT");
-        model.addColumn("Estrato");
-        model.addColumn("Total");
-        model.addColumn("Rojo");
-        model.addColumn("Negro");
-        model.addColumn("Cafe");
-        model.addColumn("Burdo_liso");
-        model.addColumn("Impresion_una");
-        model.addColumn("Peinado");
-        model.addColumn("Texturizado");
-        model.addColumn("Con_tierra_batida");
-        model.addColumn("Otro");
-        model.addColumn("Plato");
-        model.addColumn("Cajete");
-        model.addColumn("Olla");
-        model.addColumn("Vaso");
-        model.addColumn("Jarra");
-        model.addColumn("Molcajete");
-        model.addColumn("No_id");
-        model.addColumn("Borde");
-        model.addColumn("Cuerpo");
-        model.addColumn("Asa");
-        model.addColumn("Soportes");
-        model.addColumn("Registro");
-        model.addColumn("Analizo");
-        
-        tablaCeramicaMonocroma.setModel(model);
-        String[] datos = new String[32]; // Ajusta el tamaño al número de columnas en tu tabla
+    // Agrega las columnas que deseas mostrar en la tabla
+    model.addColumn("id");
+    model.addColumn("Sitio");
+    model.addColumn("Numero_de_bolsa");
+    model.addColumn("Unidad");
+    model.addColumn("Estructura");
+    model.addColumn("Cuarto");
+    model.addColumn("E");
+    model.addColumn("N");
+    model.addColumn("RT");
+    model.addColumn("Estrato");
+    model.addColumn("Total");
+    model.addColumn("Rojo");
+    model.addColumn("Negro");
+    model.addColumn("Cafe");
+    model.addColumn("Burdo_liso");
+    model.addColumn("Impresion_una");
+    model.addColumn("Peinado");
+    model.addColumn("Texturizado");
+    model.addColumn("Con_tierra_batida");
+    model.addColumn("Otro");
+    model.addColumn("Plato");
+    model.addColumn("Cajete");
+    model.addColumn("Olla");
+    model.addColumn("Vaso");
+    model.addColumn("Jarra");
+    model.addColumn("Molcajete");
+    model.addColumn("No_id");
+    model.addColumn("Borde");
+    model.addColumn("Cuerpo");
+    model.addColumn("Asa");
+    model.addColumn("Soportes");
+    model.addColumn("Registro");
+    model.addColumn("Analizo");
 
-        try {
-            st = conn.createStatement();
-            ResultSet rs = st.executeQuery(SQL);
-            while (rs.next()) {
-                for (int i = 1; i <= 32; i++) {
-                    datos[i - 1] = rs.getString(i);
-                }
-                model.addRow(datos);
+    tablaCeramicaMonocroma.setModel(model);
+    String[] datos = new String[33]; // Ajusta el tamaño al número de columnas en tu tabla
+
+    try {
+        st = conn.createStatement();
+        ResultSet rs = st.executeQuery(SQL);
+        while (rs.next()) {
+            for (int i = 1; i <= 33; i++) { // Ajusta el rango al número de columnas en tu tabla
+                datos[i - 1] = rs.getString(i);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            model.addRow(datos);
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
+
  public void eliminarRegistroMonocroma() {
     int filaSeleccionada = tablaCeramicaMonocroma.getSelectedRow();
     Connection conn = null;
@@ -122,6 +123,7 @@ public class ceramicaMonocroma extends javax.swing.JFrame {
         System.out.print(e.toString());
     }
 }
+ 
 
  
  
@@ -206,7 +208,7 @@ this.setVisible(false);
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 eliminarRegistroMonocroma();
-
+        mostrar();
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
