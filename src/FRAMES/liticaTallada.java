@@ -5,14 +5,25 @@
 package FRAMES;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class liticaTallada extends javax.swing.JFrame {
 
@@ -51,6 +62,44 @@ public void mostrarLiticatallada() {
         }
     } catch (SQLException e) {
         e.printStackTrace();
+    }
+}
+  public void descargar() throws Exception {
+    String SQL = "SELECT * FROM liticatallada";
+    CONECTOR con = new CONECTOR();
+    Connection conn = con.getConexion();
+    Statement st = conn.createStatement();
+    ResultSet rs = st.executeQuery(SQL);
+    ResultSetMetaData rsmd = rs.getMetaData();
+    int columnCount = rsmd.getColumnCount();
+
+    Workbook workbook = new XSSFWorkbook(); 
+    Sheet sheet = workbook.createSheet("liticatallada");
+
+    Row header = sheet.createRow(0);
+    for (int i = 1; i <= columnCount; i++) {
+        String columnName = rsmd.getColumnName(i);
+        Cell headerCell = header.createCell(i-1);
+        headerCell.setCellValue(columnName);
+    }
+
+    int rowIndex = 1;
+    while (rs.next()) {
+        Row row = sheet.createRow(rowIndex++);
+
+        for (int i = 1; i <= columnCount; i++) {
+            Cell cell = row.createCell(i-1);
+            cell.setCellValue(rs.getString(i));
+        }
+    }
+
+    JFileChooser fileChooser = new JFileChooser();
+    if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        FileOutputStream fileOut = new FileOutputStream(file);
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
     }
 }
   public void eliminarRegistro() {
@@ -96,6 +145,7 @@ public void mostrarLiticatallada() {
         tbLiticaTa = new javax.swing.JTable();
         btnEliminar = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -126,6 +176,13 @@ public void mostrarLiticatallada() {
             }
         });
 
+        jButton1.setText("DESCARGAR");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -136,9 +193,11 @@ public void mostrarLiticatallada() {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnEliminar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addGap(11, 11, 11)
                 .addComponent(jButton2)
-                .addGap(83, 83, 83))
+                .addGap(69, 69, 69))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -147,7 +206,8 @@ public void mostrarLiticatallada() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnEliminar)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton1))
                 .addGap(27, 27, 27))
         );
 
@@ -164,6 +224,14 @@ eliminarRegistro();
 mostrarLiticatallada();
         // TODO add your handling code here:
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            descargar();
+        } catch (Exception ex) {
+            Logger.getLogger(liticaTallada.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -202,6 +270,7 @@ mostrarLiticatallada();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tbLiticaTa;

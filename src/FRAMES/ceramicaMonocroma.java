@@ -4,6 +4,8 @@
  */
 package FRAMES;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +14,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -123,6 +134,44 @@ public void mostrar() {
         System.out.print(e.toString());
     }
 }
+   public void descargar() throws Exception {
+    String SQL = "SELECT * FROM ceramicamonocroma";
+    CONECTOR con = new CONECTOR();
+    Connection conn = con.getConexion();
+    Statement st = conn.createStatement();
+    ResultSet rs = st.executeQuery(SQL);
+    ResultSetMetaData rsmd = rs.getMetaData();
+    int columnCount = rsmd.getColumnCount();
+
+    Workbook workbook = new XSSFWorkbook(); 
+    Sheet sheet = workbook.createSheet("ceramicamonocroma");
+
+    Row header = sheet.createRow(0);
+    for (int i = 1; i <= columnCount; i++) {
+        String columnName = rsmd.getColumnName(i);
+        Cell headerCell = header.createCell(i-1);
+        headerCell.setCellValue(columnName);
+    }
+
+    int rowIndex = 1;
+    while (rs.next()) {
+        Row row = sheet.createRow(rowIndex++);
+
+        for (int i = 1; i <= columnCount; i++) {
+            Cell cell = row.createCell(i-1);
+            cell.setCellValue(rs.getString(i));
+        }
+    }
+
+    JFileChooser fileChooser = new JFileChooser();
+    if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        FileOutputStream fileOut = new FileOutputStream(file);
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+    }
+}
  
 
  
@@ -141,6 +190,7 @@ public void mostrar() {
         tablaCeramicaMonocroma = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -171,6 +221,13 @@ public void mostrar() {
             }
         });
 
+        jButton3.setText("DESCARGAR");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -182,7 +239,9 @@ public void mostrar() {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(30, 30, 30)
+                .addComponent(jButton3)
+                .addGap(30, 30, 30)
                 .addComponent(jButton2)
                 .addGap(29, 29, 29))
         );
@@ -194,7 +253,8 @@ public void mostrar() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
                 .addGap(26, 26, 26))
         );
 
@@ -211,6 +271,14 @@ eliminarRegistroMonocroma();
         mostrar();
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        try {
+            descargar();
+        } catch (Exception ex) {
+            Logger.getLogger(ceramicaMonocroma.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -250,6 +318,7 @@ eliminarRegistroMonocroma();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tablaCeramicaMonocroma;
     // End of variables declaration//GEN-END:variables

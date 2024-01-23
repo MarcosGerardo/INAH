@@ -45,8 +45,8 @@ public final class FramePrincipal extends javax.swing.JFrame {
         AutocompleterTwo(ComboBoxCarta1);
         mostrarLocus("locus");
         cargarSitios();
-        cargarEstructuraCombo();
         cargarLocusCombo();
+        cargarEstructuraCombo();
         obtenerDatosDesdeTabla();
         PanellCeramica.setVisible(false);
         PanelCeramicaDetallada.setVisible(false);
@@ -278,12 +278,12 @@ public String[] llenarCamposDesdeTablaEstructura() {
     return new String[] {idDelElementoSeleccionado, nombre, descripcion, referencia, String.valueOf(sitio_id), nombreSitio};
 }
 
- public String[] llenarCamposDesdeTablaLocus(JComboBox<String> ComboBoxL11) {
+ public void  llenarCamposDesdeTablaLocus() {
     int filaSeleccionada = visorLocus.getSelectedRow();
     
     if (filaSeleccionada == -1) {
         JOptionPane.showMessageDialog(null, "Por favor, selecciona una fila antes de editar.", "Error", JOptionPane.ERROR_MESSAGE);
-        return null;
+   
     }
 
     String idDelElementoSeleccionado = visorLocus.getValueAt(filaSeleccionada, 0).toString();
@@ -300,11 +300,10 @@ public String[] llenarCamposDesdeTablaEstructura() {
     locus.setUbicacion(ubicacion);
     locus.setReferencia(referencia);
     locus.setColor(color);
-     llenarComboBoxLocus(ComboBoxE);
+     //llenarComboBoxLocus(ComboBoxE);
     locus.setVisible(true);
     
 
-    return new String[] {idDelElementoSeleccionado, nombre, descripcion, ubicacion, referencia, color};
 }
 
 public void llenarComboBoxCar(JComboBox comboBox) {
@@ -484,13 +483,13 @@ public int obtenerClavePrimariaDelRegistro() {
          CONECTOR con=new CONECTOR();
         conn = con.getConexion();
         DefaultTableModel model= new DefaultTableModel();
-         model.addColumn("id");
-         model.addColumn("nombre");
-         model.addColumn("descripcion");
-         model.addColumn("referencia");
-         model.addColumn("coordenadas");
+         model.addColumn("ID");
+         model.addColumn("Nombre");
+         model.addColumn("Descripcion");
+         model.addColumn("Referencia");
+         model.addColumn("Coordenadas");
          model.addColumn("CartaTopografica");
-         model.addColumn("tipo");
+         model.addColumn("Tipo");
          visor.setModel(model);
          String [] datos =new String[7];
          try {
@@ -569,12 +568,12 @@ public int obtenerClavePrimariaDelRegistro() {
          CONECTOR con=new CONECTOR();
         conn = con.getConexion();
         DefaultTableModel model= new DefaultTableModel();
-         model.addColumn("id");
-         model.addColumn("nombre");
-         model.addColumn("descripcion");
-         model.addColumn("referencia");
+         model.addColumn("ID");
+         model.addColumn("Nombre");
+         model.addColumn("Descripcion");
+         model.addColumn("Referencia");
          model.addColumn("sitio_id");
-          model.addColumn("NombreSitio");
+         model.addColumn("Sitio");
       
          visorEstructuras.setModel(model);
          String [] datos =new String[6];
@@ -769,20 +768,21 @@ private void eliminarRegistroLocus() {
   
 public void mostrarLocus(String Tabla) {
     Connection conn = null;
-    String SQL = "SELECT  * FROM LOCUS;";
+    String SQL = "SELECT locus.id, locus.nombre, locus.descripcion, locus.ubicacion, locus.referencia, locus.color, estructuras.nombre AS NombreEstructura FROM locus JOIN estructuras ON locus.estructura_id = estructuras.id;";
     Statement st;
     CONECTOR con = new CONECTOR();
     conn = con.getConexion();
     DefaultTableModel model = new DefaultTableModel();
-    model.addColumn("id");
-    model.addColumn("nombre");
-    model.addColumn("descripcion");
-    model.addColumn("referencia");
-    model.addColumn("estructura_id");
-    model.addColumn("NombreEstructura");
+    model.addColumn("ID");
+    model.addColumn("Nombre");
+    model.addColumn("Descripcion");
+    model.addColumn("Ubicacion");
+    model.addColumn("Referencia");
+    model.addColumn("Color");
+    model.addColumn("Estructura");
 
     visorLocus.setModel(model);
-    String[] datos = new String[6];
+    String[] datos = new String[7];
     try {
         st = conn.createStatement();
         ResultSet rs = st.executeQuery(SQL);
@@ -793,12 +793,16 @@ public void mostrarLocus(String Tabla) {
             datos[3] = rs.getString(4);
             datos[4] = rs.getString(5);
             datos[5] = rs.getString(6);
+            datos[6] = rs.getString(7);
             model.addRow(datos);
         }
     } catch (SQLException e) {
         JOptionPane.showMessageDialog(null, "ERROR");
     }
 }
+
+
+
 
 private void cargarEstructuraCombo() {
     Connection conn = null;
@@ -1206,6 +1210,32 @@ private void limpiarCampostallada() {
     jTextField82.setText("");
     jTextField83.setText("");
 }
+private void limpiarCamposPu() {
+cbSitio3.setSelectedIndex(0);
+    nobolsa.setText("");
+    cbEstructura3.setSelectedIndex(0);
+    cbLocus3.setSelectedIndex(0);
+    EE.setText("");
+    NN.setText("");
+    COMPLETADO.setText("");
+    FRACTURADO.setText("");
+    METATE.setText("");
+    MORTERO.setText("");
+    MMETATE.setText("");
+    MMORTERO.setText("");
+    PULIDOR.setText("");
+    HACHA.setText("");
+    OTRO.setText("");
+    MATERIA.setText("");
+    CARAS.setText("");
+    LARGO.setText("");
+    ANCHO.setText("");
+    GROSOR.setText("");
+    REGIS.setText("");
+    ANA.setText("");
+    OBSERVACIONES.setText("");
+}
+
 
 
 private void limpiarCamposEditarsitios() {
@@ -1784,7 +1814,6 @@ private void limpiarCamposDecorada() {
         btnEditar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
-        jLabel18 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         visorEstructuras = new javax.swing.JTable();
@@ -1872,10 +1901,10 @@ private void limpiarCamposDecorada() {
         jLabel170 = new javax.swing.JLabel();
         jTextField97 = new javax.swing.JTextField();
         jTextField98 = new javax.swing.JTextField();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
         jLabel171 = new javax.swing.JLabel();
-        jButton13 = new javax.swing.JButton();
+        jButton23 = new javax.swing.JButton();
+        jButton24 = new javax.swing.JButton();
+        jButton25 = new javax.swing.JButton();
         PanellCeramica = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         cbSitioCM = new javax.swing.JComboBox<>();
@@ -1955,6 +1984,7 @@ private void limpiarCamposDecorada() {
         jButton5 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
         PanelCeramicaDetallada = new javax.swing.JPanel();
+        jButton14 = new javax.swing.JButton();
         jLabel42 = new javax.swing.JLabel();
         jPanel15 = new javax.swing.JPanel();
         cbSitioDC = new javax.swing.JComboBox<>();
@@ -2044,9 +2074,8 @@ private void limpiarCamposDecorada() {
         jLabel113 = new javax.swing.JLabel();
         txtReg = new javax.swing.JTextField();
         txtAnali = new javax.swing.JTextField();
-        btnConsul = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
         PanelLiticaTa = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         cbSitio1 = new javax.swing.JComboBox<>();
@@ -2094,9 +2123,9 @@ private void limpiarCamposDecorada() {
         jLabel132 = new javax.swing.JLabel();
         jTextField82 = new javax.swing.JTextField();
         jTextField83 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton12 = new javax.swing.JButton();
+        jButton17 = new javax.swing.JButton();
+        jButton18 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
         PanelLiticaPu = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel44 = new javax.swing.JLabel();
@@ -2107,8 +2136,6 @@ private void limpiarCamposDecorada() {
         jScrollPane8 = new javax.swing.JScrollPane();
         OBSERVACIONES = new javax.swing.JTextArea();
         jLabel150 = new javax.swing.JLabel();
-        jButton6 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
         jPanel25 = new javax.swing.JPanel();
         jLabel38 = new javax.swing.JLabel();
         cbSitio3 = new javax.swing.JComboBox<>();
@@ -2152,12 +2179,15 @@ private void limpiarCamposDecorada() {
         ANCHO = new javax.swing.JTextField();
         jLabel147 = new javax.swing.JLabel();
         GROSOR = new javax.swing.JTextField();
+        jButton20 = new javax.swing.JButton();
+        jButton21 = new javax.swing.JButton();
+        jButton22 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 183, 164));
 
-        jPanel1.setBackground(new java.awt.Color(176, 142, 107));
+        jPanel1.setBackground(new java.awt.Color(98, 158, 98));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButton4.setBackground(new java.awt.Color(100, 124, 108));
@@ -2371,7 +2401,7 @@ private void limpiarCamposDecorada() {
         btnSitiosLayout.setHorizontalGroup(
             btnSitiosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnSitiosLayout.createSequentialGroup()
-                .addContainerGap(32, Short.MAX_VALUE)
+                .addContainerGap(34, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
@@ -2396,7 +2426,7 @@ private void limpiarCamposDecorada() {
         jLabel1.setText("jLabel1");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 190, 70));
 
-        vtnVentanas.setBackground(new java.awt.Color(245, 225, 206));
+        vtnVentanas.setBackground(new java.awt.Color(151, 112, 112));
         vtnVentanas.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         vtnVentanas.setForeground(new java.awt.Color(255, 255, 255));
         vtnVentanas.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2535,10 +2565,6 @@ private void limpiarCamposDecorada() {
             }
         });
         jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 350, 60, 60));
-
-        jLabel18.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        jLabel18.setText("SITIOS");
-        jPanel3.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 20, -1, -1));
 
         vtnVentanas.addTab("SITIOS", jPanel3);
 
@@ -2754,6 +2780,8 @@ private void limpiarCamposDecorada() {
         });
         jPanel5.add(btnEliminarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 290, -1, -1));
 
+        visorLocus.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        visorLocus.setForeground(new java.awt.Color(0, 0, 0));
         visorLocus.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2857,9 +2885,9 @@ private void limpiarCamposDecorada() {
                     .addComponent(jTextField1)
                     .addComponent(jTextField86, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jTextField88, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextField87, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                    .addComponent(jTextField87)
                     .addComponent(jTextField89))
-                .addGap(50, 50, 50))
+                .addGap(77, 77, 77))
         );
         jPanel28Layout.setVerticalGroup(
             jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2899,7 +2927,7 @@ private void limpiarCamposDecorada() {
                 .addGap(4, 4, 4))
         );
 
-        PanelOtro.add(jPanel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, -1, -1));
+        PanelOtro.add(jPanel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 210, -1));
 
         jPanel29.setBackground(new java.awt.Color(245, 225, 206));
         jPanel29.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -2963,7 +2991,7 @@ private void limpiarCamposDecorada() {
                         .addComponent(jLabel160)
                         .addGap(18, 18, 18)
                         .addComponent(cbEstructura2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(54, Short.MAX_VALUE))
         );
         jPanel30Layout.setVerticalGroup(
             jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2983,7 +3011,7 @@ private void limpiarCamposDecorada() {
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        PanelOtro.add(jPanel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
+        PanelOtro.add(jPanel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 210, -1));
 
         jPanel31.setBackground(new java.awt.Color(245, 225, 206));
         jPanel31.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -3047,7 +3075,7 @@ private void limpiarCamposDecorada() {
                 .addGap(168, 168, 168))
         );
 
-        PanelOtro.add(jPanel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, -1, 160));
+        PanelOtro.add(jPanel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 170, -1, 160));
 
         jPanel32.setBackground(new java.awt.Color(245, 225, 206));
         jPanel32.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -3072,7 +3100,7 @@ private void limpiarCamposDecorada() {
                         .addComponent(jTextField94, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel32Layout.createSequentialGroup()
                         .addComponent(jLabel168)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                         .addComponent(jTextField96, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel32Layout.createSequentialGroup()
                         .addComponent(jLabel167)
@@ -3101,7 +3129,7 @@ private void limpiarCamposDecorada() {
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
-        PanelOtro.add(jPanel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 190, 180, -1));
+        PanelOtro.add(jPanel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 20, 180, -1));
 
         jPanel33.setBackground(new java.awt.Color(245, 225, 206));
         jPanel33.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -3142,41 +3170,39 @@ private void limpiarCamposDecorada() {
 
         PanelOtro.add(jPanel33, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 220, 350, -1));
 
-        jButton9.setBackground(new java.awt.Color(255, 255, 255));
-        jButton9.setForeground(new java.awt.Color(0, 0, 0));
-        jButton9.setText("REGISTRAR");
-        jButton9.setBorder(null);
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton9ActionPerformed(evt);
-            }
-        });
-        PanelOtro.add(jButton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 340, 70, 20));
-
-        jButton10.setBackground(new java.awt.Color(255, 255, 255));
-        jButton10.setForeground(new java.awt.Color(0, 0, 0));
-        jButton10.setText("CONSULTAR");
-        jButton10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton10ActionPerformed(evt);
-            }
-        });
-        PanelOtro.add(jButton10, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 340, -1, -1));
-
         jLabel171.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel171.setText("OTRO MATERIAL");
         PanelOtro.add(jLabel171, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 0, -1, -1));
 
-        jButton13.setBackground(new java.awt.Color(255, 255, 255));
-        jButton13.setForeground(new java.awt.Color(0, 0, 0));
-        jButton13.setText("LIMPIAR");
-        jButton13.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
+        jButton23.setBackground(new java.awt.Color(255, 255, 255));
+        jButton23.setForeground(new java.awt.Color(0, 0, 0));
+        jButton23.setText("CONSULTAR");
+        jButton23.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
+                jButton23ActionPerformed(evt);
             }
         });
-        PanelOtro.add(jButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 340, -1, -1));
+        PanelOtro.add(jButton23, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 330, -1, -1));
+
+        jButton24.setBackground(new java.awt.Color(255, 255, 255));
+        jButton24.setForeground(new java.awt.Color(0, 0, 0));
+        jButton24.setText("REGISTRAR");
+        jButton24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton24ActionPerformed(evt);
+            }
+        });
+        PanelOtro.add(jButton24, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 330, -1, -1));
+
+        jButton25.setBackground(new java.awt.Color(255, 255, 255));
+        jButton25.setForeground(new java.awt.Color(0, 0, 0));
+        jButton25.setText("LIMPIAR");
+        jButton25.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton25ActionPerformed(evt);
+            }
+        });
+        PanelOtro.add(jButton25, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 330, -1, -1));
 
         PanellCeramica.setBackground(new java.awt.Color(245, 225, 206));
 
@@ -3701,6 +3727,15 @@ private void limpiarCamposDecorada() {
         PanelCeramicaDetallada.setBackground(new java.awt.Color(245, 225, 206));
         PanelCeramicaDetallada.setPreferredSize(new java.awt.Dimension(872, 447));
 
+        jButton14.setBackground(new java.awt.Color(255, 255, 255));
+        jButton14.setForeground(new java.awt.Color(0, 0, 0));
+        jButton14.setText("REGISTRAR");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
         jLabel42.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel42.setText("CERAMICA DECORADA");
 
@@ -4182,11 +4217,11 @@ private void limpiarCamposDecorada() {
                 .addGroup(jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel112)
                     .addComponent(jLabel113))
-                .addGap(24, 24, 24)
-                .addGroup(jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtAnali, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtReg, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtReg, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                    .addComponent(txtAnali))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         jPanel20Layout.setVerticalGroup(
             jPanel20Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -4202,33 +4237,21 @@ private void limpiarCamposDecorada() {
                 .addContainerGap(50, Short.MAX_VALUE))
         );
 
-        btnConsul.setBackground(new java.awt.Color(255, 255, 255));
-        btnConsul.setForeground(new java.awt.Color(0, 0, 0));
-        btnConsul.setText("CONSULTAR");
-        btnConsul.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        btnConsul.addActionListener(new java.awt.event.ActionListener() {
+        jButton15.setBackground(new java.awt.Color(255, 255, 255));
+        jButton15.setForeground(new java.awt.Color(0, 0, 0));
+        jButton15.setText("LIMPIAR");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConsulActionPerformed(evt);
+                jButton15ActionPerformed(evt);
             }
         });
 
-        jButton7.setBackground(new java.awt.Color(255, 255, 255));
-        jButton7.setForeground(new java.awt.Color(0, 0, 0));
-        jButton7.setText("REGISTRAR");
-        jButton7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        jButton16.setBackground(new java.awt.Color(255, 255, 255));
+        jButton16.setForeground(new java.awt.Color(0, 0, 0));
+        jButton16.setText("CONSULTAR");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
-            }
-        });
-
-        btnEdit.setBackground(new java.awt.Color(255, 255, 255));
-        btnEdit.setForeground(new java.awt.Color(0, 0, 0));
-        btnEdit.setText("LIMPIAR");
-        btnEdit.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditActionPerformed(evt);
+                jButton16ActionPerformed(evt);
             }
         });
 
@@ -4247,26 +4270,23 @@ private void limpiarCamposDecorada() {
                 .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel42)
                     .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel107)))
-                            .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
-                                .addGap(46, 46, 46)
-                                .addComponent(jButton7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnEdit)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnConsul))))
-                    .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
                         .addGap(35, 35, 35)
-                        .addComponent(jLabel98)))
-                .addContainerGap())
+                        .addComponent(jLabel98))
+                    .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel107)
+                            .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
+                                .addComponent(jButton14)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton15)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton16))
+                            .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
         PanelCeramicaDetalladaLayout.setVerticalGroup(
             PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -4276,6 +4296,11 @@ private void limpiarCamposDecorada() {
                     .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
                         .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jLabel42)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -4284,22 +4309,17 @@ private void limpiarCamposDecorada() {
                                     .addComponent(jLabel107))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
                                         .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
                                         .addComponent(jPanel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGap(14, 14, 14)
                                         .addGroup(PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                            .addComponent(jButton7)
-                                            .addComponent(btnConsul)
-                                            .addComponent(btnEdit)))))
-                            .addGroup(PanelCeramicaDetalladaLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                            .addComponent(jButton14)
+                                            .addComponent(jButton15)
+                                            .addComponent(jButton16)))
+                                    .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 61, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -4437,7 +4457,7 @@ private void limpiarCamposDecorada() {
                 .addGroup(jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldRT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel173))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(245, 225, 206));
@@ -4622,33 +4642,30 @@ private void limpiarCamposDecorada() {
                 .addContainerGap(21, Short.MAX_VALUE))
         );
 
-        jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setForeground(new java.awt.Color(0, 0, 0));
-        jButton1.setText("REGISTRAR");
-        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButton17.setBackground(new java.awt.Color(255, 255, 255));
+        jButton17.setForeground(new java.awt.Color(0, 0, 0));
+        jButton17.setText("REGISTRAR");
+        jButton17.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButton17ActionPerformed(evt);
             }
         });
 
-        jButton2.setBackground(new java.awt.Color(255, 255, 255));
-        jButton2.setForeground(new java.awt.Color(0, 0, 0));
-        jButton2.setText("CONSULTAR");
-        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButton18.setBackground(new java.awt.Color(255, 255, 255));
+        jButton18.setForeground(new java.awt.Color(0, 0, 0));
+        jButton18.setText("LIMPIAR");
+        jButton18.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButton18ActionPerformed(evt);
             }
         });
 
-        jButton12.setBackground(new java.awt.Color(255, 255, 255));
-        jButton12.setForeground(new java.awt.Color(0, 0, 0));
-        jButton12.setText("LIMPIAR");
-        jButton12.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton12.addActionListener(new java.awt.event.ActionListener() {
+        jButton19.setBackground(new java.awt.Color(255, 255, 255));
+        jButton19.setForeground(new java.awt.Color(0, 0, 0));
+        jButton19.setText("CONSULTAR");
+        jButton19.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton12ActionPerformed(evt);
+                jButton19ActionPerformed(evt);
             }
         });
 
@@ -4659,61 +4676,59 @@ private void limpiarCamposDecorada() {
             .addGroup(PanelLiticaTaLayout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PanelLiticaTaLayout.createSequentialGroup()
-                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
+                    .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel43)
-                        .addGap(18, 18, 18)
-                        .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelLiticaTaLayout.createSequentialGroup()
                         .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(PanelLiticaTaLayout.createSequentialGroup()
-                                .addGap(394, 394, 394)
-                                .addComponent(jButton1)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton12)
-                                .addGap(17, 17, 17)
-                                .addComponent(jButton2))
-                            .addGroup(PanelLiticaTaLayout.createSequentialGroup()
                                 .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(212, 212, 212)
-                                .addComponent(jPanel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(44, 44, 44))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelLiticaTaLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton17)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton19)
+                        .addGap(99, 99, 99))))
         );
         PanelLiticaTaLayout.setVerticalGroup(
             PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelLiticaTaLayout.createSequentialGroup()
                 .addGap(15, 15, 15)
+                .addComponent(jLabel43)
+                .addGap(18, 18, 18)
                 .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelLiticaTaLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(59, 59, 59)
-                        .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(jButton2)
-                            .addComponent(jButton12))
-                        .addGap(155, 155, 155))
-                    .addGroup(PanelLiticaTaLayout.createSequentialGroup()
-                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(PanelLiticaTaLayout.createSequentialGroup()
                         .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(PanelLiticaTaLayout.createSequentialGroup()
-                                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel43))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jPanel22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jPanel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(PanelLiticaTaLayout.createSequentialGroup()
+                                    .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(32, 32, 32)
+                        .addGroup(PanelLiticaTaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton17)
+                            .addComponent(jButton18)
+                            .addComponent(jButton19))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(PanelLiticaTaLayout.createSequentialGroup()
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         PanelLiticaPu.setBackground(new java.awt.Color(245, 225, 206));
@@ -4744,20 +4759,6 @@ private void limpiarCamposDecorada() {
         jScrollPane8.setViewportView(OBSERVACIONES);
 
         jLabel150.setText("OBSERVACIONES:");
-
-        jButton6.setText("REGISTRAR");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-
-        jButton8.setText("CONSULTAR");
-        jButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton8ActionPerformed(evt);
-            }
-        });
 
         jPanel25.setBackground(new java.awt.Color(245, 225, 206));
         jPanel25.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -5039,6 +5040,33 @@ private void limpiarCamposDecorada() {
                 .addContainerGap(72, Short.MAX_VALUE))
         );
 
+        jButton20.setBackground(new java.awt.Color(255, 255, 255));
+        jButton20.setForeground(new java.awt.Color(0, 0, 0));
+        jButton20.setText("REGISTRAR");
+        jButton20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton20ActionPerformed(evt);
+            }
+        });
+
+        jButton21.setBackground(new java.awt.Color(255, 255, 255));
+        jButton21.setForeground(new java.awt.Color(0, 0, 0));
+        jButton21.setText("CONSULTAR");
+        jButton21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton21ActionPerformed(evt);
+            }
+        });
+
+        jButton22.setBackground(new java.awt.Color(255, 255, 255));
+        jButton22.setForeground(new java.awt.Color(0, 0, 0));
+        jButton22.setText("LIMPIAR");
+        jButton22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton22ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout PanelLiticaPuLayout = new javax.swing.GroupLayout(PanelLiticaPu);
         PanelLiticaPu.setLayout(PanelLiticaPuLayout);
         PanelLiticaPuLayout.setHorizontalGroup(
@@ -5067,18 +5095,21 @@ private void limpiarCamposDecorada() {
                                         .addGap(22, 22, 22)
                                         .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(PanelLiticaPuLayout.createSequentialGroup()
-                                        .addComponent(jButton6)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jButton8))
-                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
                                         .addComponent(jLabel149)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(ANA, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(PanelLiticaPuLayout.createSequentialGroup()
                                         .addComponent(jLabel148)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(REGIS, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 4, Short.MAX_VALUE))))))
+                                        .addComponent(REGIS, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(PanelLiticaPuLayout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jButton20)
+                                            .addComponent(jButton22))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jButton21)))
+                                .addGap(0, 5, Short.MAX_VALUE))))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelLiticaPuLayout.createSequentialGroup()
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -5114,8 +5145,10 @@ private void limpiarCamposDecorada() {
                                 .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(30, 30, 30)
                                 .addGroup(PanelLiticaPuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jButton6)
-                                    .addComponent(jButton8))))))
+                                    .addComponent(jButton20)
+                                    .addComponent(jButton21))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton22)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -5131,17 +5164,17 @@ private void limpiarCamposDecorada() {
                 .addGap(445, 445, 445))
             .addGroup(ContenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(ContenedorLayout.createSequentialGroup()
-                    .addGap(0, 657, Short.MAX_VALUE)
+                    .addGap(0, 686, Short.MAX_VALUE)
                     .addComponent(PanelCeramicaDetallada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 658, Short.MAX_VALUE)))
+                    .addGap(0, 687, Short.MAX_VALUE)))
             .addGroup(ContenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(ContenedorLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(PanelLiticaPu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(1309, Short.MAX_VALUE)))
+                    .addContainerGap(1367, Short.MAX_VALUE)))
             .addGroup(ContenedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ContenedorLayout.createSequentialGroup()
-                    .addContainerGap(727, Short.MAX_VALUE)
+                    .addContainerGap(785, Short.MAX_VALUE)
                     .addComponent(PanelOtro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(588, 588, 588)))
         );
@@ -5281,7 +5314,7 @@ int respuesta = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quie
     }//GEN-LAST:event_ComboBoxL1ActionPerformed
 
     private void visorLocusMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_visorLocusMouseClicked
-        mostrarLocus("LOCUS");
+        //mostrarLocus("LOCUS");
     }//GEN-LAST:event_visorLocusMouseClicked
 
     private void btnEliminarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarLocusActionPerformed
@@ -5310,7 +5343,9 @@ int filaSeleccionada = visorLocus.getSelectedRow();
 
     private void btnRegistrarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarLocusActionPerformed
        registrarLocus();
+      
         mostrarLocus("locus");
+        cargarLocusCombo();
         
     }//GEN-LAST:event_btnRegistrarLocusActionPerformed
 
@@ -5323,8 +5358,9 @@ int filaSeleccionada = visorLocus.getSelectedRow();
     }//GEN-LAST:event_btnRegistrarLocusMouseMoved
 
     private void btnEditarLocusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarLocusActionPerformed
-        llenarCamposDesdeTablaLocus(ComboBoxL1);
+        llenarCamposDesdeTablaLocus();
         mostrarLocus("locus");
+        //cargarLocusCombo();
     }//GEN-LAST:event_btnEditarLocusActionPerformed
 
     private void btnEditarLocusMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarLocusMouseExited
@@ -5374,6 +5410,8 @@ int filaSeleccionada = visorLocus.getSelectedRow();
     private void btnRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrar1ActionPerformed
         registrarEstructura();
         mostrarEstructura("estructuras");
+        cargarEstructuraCombo();
+        
 
 
     }//GEN-LAST:event_btnRegistrar1ActionPerformed
@@ -5393,6 +5431,7 @@ int filaSeleccionada = visorLocus.getSelectedRow();
         txtDescripcionE.setText("");
         txtReferenciaE.setText("");
         ComboBoxE.setSelectedIndex(0);
+        cargarEstructuraCombo();
 
   
     }//GEN-LAST:event_btnLimpiar1ActionPerformed
@@ -5475,6 +5514,7 @@ int filaSeleccionada = visorLocus.getSelectedRow();
       btnEditar.setToolTipText("Modificar formulario");
    btnEditar.setToolTipText("Modificar formulario");
    llenarCamposDesdeTabla();
+   cargarSitios();
 
     }//GEN-LAST:event_btnEditarActionPerformed
 
@@ -5488,6 +5528,7 @@ int filaSeleccionada = visorLocus.getSelectedRow();
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
         btnRegistrar.setToolTipText("REGISTRAR NUEVO SITIO");
+      
         String nombre = txtNombre.getText();
         String descripcion = txtDescripcion.getText();
         String referencia = txtReferencia.getText();
@@ -5497,6 +5538,7 @@ int filaSeleccionada = visorLocus.getSelectedRow();
         // Aquí llama a la función para insertar datos en la base de datos
         Insertar(nombre, descripcion, referencia, coordenadas, carta, tipo);
         mostrar("sitios");
+          cargarSitios();
      
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
@@ -5534,71 +5576,69 @@ cer.setVisible(true);
        
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-
-        liticaTallada li = new liticaTallada();
-        li.mostrarLiticatallada();
-        li.setVisible(true);
-
-       
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-registrarCeramicaDecorada();
-       
-    }//GEN-LAST:event_jButton7ActionPerformed
-
-    private void btnConsulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsulActionPerformed
-ceramicaDecorada cer = new ceramicaDecorada();
-cer.mostrarCeramicaDecorada();
-cer.setVisible(true);
-
-        
-    }//GEN-LAST:event_btnConsulActionPerformed
-
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-registrarLiticapulida();
-        
-    }//GEN-LAST:event_jButton6ActionPerformed
-
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-liticapulida pu=new liticapulida();
-pu.mostrarLiticapulida();
-pu.setVisible(true);
-        
-    }//GEN-LAST:event_jButton8ActionPerformed
-
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-OTROS otro = new OTROS();
-otro.mostrar();
-otro.setVisible(true);
-    }//GEN-LAST:event_jButton10ActionPerformed
-
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
        
       limpiarCamposEditarsitios();
     }//GEN-LAST:event_jButton11ActionPerformed
 
-    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-         limpiarCamposDecorada();
-    }//GEN-LAST:event_btnEditActionPerformed
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+ registrarCeramicaDecorada();
+    }//GEN-LAST:event_jButton14ActionPerformed
 
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-       limpiarCampostallada();
-    }//GEN-LAST:event_jButton12ActionPerformed
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+ limpiarCamposDecorada();
+    }//GEN-LAST:event_jButton15ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-registrarLiticatallada();   
-      
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+   ceramicaDecorada cer = new ceramicaDecorada();
+cer.mostrarCeramicaDecorada();
+cer.setVisible(true);
 
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        registrarOtroMaterial();
-    }//GEN-LAST:event_jButton9ActionPerformed
+    }//GEN-LAST:event_jButton16ActionPerformed
 
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-      limpiarCamposoTRO();
-    }//GEN-LAST:event_jButton13ActionPerformed
+    private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
+       registrarLiticatallada();   
+    }//GEN-LAST:event_jButton17ActionPerformed
+
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+           limpiarCampostallada();
+    }//GEN-LAST:event_jButton18ActionPerformed
+
+    private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
+       liticaTallada li = new liticaTallada();
+        li.mostrarLiticatallada();
+        li.setVisible(true);
+
+    }//GEN-LAST:event_jButton19ActionPerformed
+
+    private void jButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton20ActionPerformed
+      registrarLiticapulida();
+    }//GEN-LAST:event_jButton20ActionPerformed
+
+    private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
+   liticapulida pu=new liticapulida();
+pu.mostrarLiticapulida();
+pu.setVisible(true);
+    }//GEN-LAST:event_jButton21ActionPerformed
+
+    private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
+ limpiarCamposPu();
+    }//GEN-LAST:event_jButton22ActionPerformed
+
+    private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
+OTROS otro = new OTROS();
+otro.mostrar();
+otro.setVisible(true);      
+              
+    }//GEN-LAST:event_jButton23ActionPerformed
+
+    private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
+          registrarOtroMaterial();
+    }//GEN-LAST:event_jButton24ActionPerformed
+
+    private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
+  limpiarCamposoTRO();
+    }//GEN-LAST:event_jButton25ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -5665,8 +5705,6 @@ registrarLiticatallada();
     public static javax.swing.JPanel PanelOtro;
     public static javax.swing.JPanel PanellCeramica;
     private javax.swing.JTextField REGIS;
-    private javax.swing.JButton btnConsul;
-    private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEditar1;
     private javax.swing.JButton btnEditarLocus;
@@ -5700,19 +5738,22 @@ registrarLiticatallada();
     private javax.swing.JComboBox<String> cbSitio3;
     private javax.swing.JComboBox<String> cbSitioCM;
     private javax.swing.JComboBox<String> cbSitioDC;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
+    private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton19;
+    private javax.swing.JButton jButton20;
+    private javax.swing.JButton jButton21;
+    private javax.swing.JButton jButton22;
+    private javax.swing.JButton jButton23;
+    private javax.swing.JButton jButton24;
+    private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel100;
@@ -5795,7 +5836,6 @@ registrarLiticatallada();
     private javax.swing.JLabel jLabel171;
     private javax.swing.JLabel jLabel172;
     private javax.swing.JLabel jLabel173;
-    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;

@@ -6,8 +6,7 @@ package FRAMES;
 
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,15 +18,13 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
+
 
 public class liticapulida extends javax.swing.JFrame {
 
@@ -103,53 +100,44 @@ public class liticapulida extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage());
     }
 }
-public void descargarLiticaPulidaXML() throws ParserConfigurationException {
-    Connection conn = null;
+
+
+public void descargarLiticaPulidaXLSX() throws Exception {
     String SQL = "SELECT * FROM liticapulida";
-    Statement st;
     CONECTOR con = new CONECTOR();
-    conn =  con.getConexion();
+    Connection conn = con.getConexion();
+    Statement st = conn.createStatement();
+    ResultSet rs = st.executeQuery(SQL);
+    ResultSetMetaData rsmd = rs.getMetaData();
+    int columnCount = rsmd.getColumnCount();
 
-    try {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+    Workbook workbook = new XSSFWorkbook(); 
+    Sheet sheet = workbook.createSheet("liticapulida");
 
-        Document doc = docBuilder.newDocument();
-        Element rootElement = doc.createElement("liticapulida");
-        doc.appendChild(rootElement);
+    Row header = sheet.createRow(0);
+    for (int i = 1; i <= columnCount; i++) {
+        String columnName = rsmd.getColumnName(i);
+        Cell headerCell = header.createCell(i-1);
+        headerCell.setCellValue(columnName);
+    }
 
-        st = conn.createStatement();
-        ResultSet rs = st.executeQuery(SQL);
+    int rowIndex = 1;
+    while (rs.next()) {
+        Row row = sheet.createRow(rowIndex++);
 
-        while (rs.next()) {
-            Element fila = doc.createElement("fila");
-            rootElement.appendChild(fila);
-
-            ResultSetMetaData rsmd = rs.getMetaData();
-            int columnCount = rsmd.getColumnCount();
-
-            for (int i = 1; i <= columnCount; i++) {
-                String columnName = rsmd.getColumnName(i);
-                Element columna = doc.createElement(columnName);
-                columna.appendChild(doc.createTextNode(rs.getString(i)));
-                fila.appendChild(columna);
-            }
+        for (int i = 1; i <= columnCount; i++) {
+            Cell cell = row.createCell(i-1);
+            cell.setCellValue(rs.getString(i));
         }
+    }
 
-        JFileChooser fileChooser = new JFileChooser();
-        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(file);
-
-            transformer.transform(source, result);
-        }
-
-    } catch (SQLException | TransformerException e) {
-        e.printStackTrace();
+    JFileChooser fileChooser = new JFileChooser();
+    if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        File file = fileChooser.getSelectedFile();
+        FileOutputStream fileOut = new FileOutputStream(file);
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
     }
 }
 
@@ -205,16 +193,16 @@ public void descargarLiticaPulidaXML() throws ParserConfigurationException {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1072, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEliminar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton2))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1072, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 22, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnEliminar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addGap(52, 52, 52))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,8 +211,8 @@ public void descargarLiticaPulidaXML() throws ParserConfigurationException {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnEliminar)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
                 .addGap(27, 27, 27))
         );
 
@@ -244,9 +232,11 @@ eliminarRegistro();
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         
         try {
-            descargarLiticaPulidaXML();
+           descargarLiticaPulidaXLSX();
             // TODO add your handling code here:
         } catch (ParserConfigurationException ex) {
+            Logger.getLogger(liticapulida.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(liticapulida.class.getName()).log(Level.SEVERE, null, ex);
         }
        
