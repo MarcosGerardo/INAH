@@ -26,6 +26,10 @@ public class editarLocus extends javax.swing.JFrame {
         llenarComboBoxLocus(ComboBoxL);
     }
 
+    private editarLocus() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public void setId(String id) {
        this.idDelElementoSeleccionado = id;
     }

@@ -22,6 +22,10 @@ public class editarSitios extends javax.swing.JFrame {
         this.framePrincipal = aThis;
     }
 
+    private editarSitios() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public void setId(String id) {
         this.idDelElementoSeleccionado = id;
     }
@@ -276,13 +280,15 @@ dispose();
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+     
          
-            public void run() {
-                new editarSitios(this).setVisible(true);
-            }
+           
+                java.awt.EventQueue.invokeLater(() -> {
+            new editarSitios().setVisible(true);
+     
         });
     }
+               
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox<String> ComboBoxCar;
