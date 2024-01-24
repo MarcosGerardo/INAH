@@ -44,19 +44,56 @@ public void mostrarCeramicaDecorada() {
     DefaultTableModel model = new DefaultTableModel();
 
     // Agrega las columnas que deseas mostrar en la tabla
-    String[] columnNames = {"Sitio", "Numero_de_bolsa", "Unidad", "Estructura", "Cuarto", "E", "N", "RT", "Estrato", "Total", "Rojo", "Negro", "Cafe", "Burdo_liso", "Impresion_una", "Peinado", "Texturizado", "Con_tierra_batida", "Otro", "Plato", "Cajete", "Olla", "Vaso", "Jarra", "Molcajete", "No_id", "Borde", "Cuerpo", "Asa", "Soportes", "Registro", "Analizo"};
-    for (String columnName : columnNames) {
-        model.addColumn(columnName);
-    }
+    model.addColumn("id");
+    model.addColumn("Sitio");
+    model.addColumn("Bolsa");
+    model.addColumn("Unidad");
+    model.addColumn("Estructura");
+    model.addColumn("Cuarto_o_subestructura");
+    model.addColumn("E");
+    model.addColumn("N");
+    model.addColumn("RT");
+    model.addColumn("Estrato");
+    model.addColumn("Total");
+    model.addColumn("Suchil");
+    model.addColumn("Vesuvio");
+    model.addColumn("Michilia");
+    model.addColumn("Amaro");
+    model.addColumn("Mercado");
+    model.addColumn("Neveria");
+    model.addColumn("Refugio");
+    model.addColumn("Lolandis");
+    model.addColumn("Otinapa");
+    model.addColumn("Morcillo");
+    model.addColumn("Nayar");
+    model.addColumn("Canatlan");
+    model.addColumn("Madero_Fluted");
+    model.addColumn("De_la_costa");
+    model.addColumn("NI");
+    model.addColumn("plato");
+    model.addColumn("cajete");
+    model.addColumn("olla");
+    model.addColumn("vaso");
+    model.addColumn("jarra");
+    model.addColumn("copa");
+    model.addColumn("cajete_asa_de_canasta");
+    model.addColumn("molcajete");
+    model.addColumn("NId");
+    model.addColumn("borde");
+    model.addColumn("cuerpo");
+    model.addColumn("asa");
+    model.addColumn("soportes");
+    model.addColumn("Registro");
+    model.addColumn("Analizo");
 
     tbDetallada.setModel(model);
-    String[] datos = new String[columnNames.length];
+    String[] datos = new String[40]; // Ajusta el tamaño al número de columnas en tu tabla
 
     try {
         st = conn.createStatement();
         ResultSet rs = st.executeQuery(SQL);
         while (rs.next()) {
-            for (int i = 1; i <= columnNames.length; i++) {
+            for (int i = 1; i <= 40; i++) { // Ajusta el rango al número de columnas en tu tabla
                 datos[i - 1] = rs.getString(i);
             }
             model.addRow(datos);
@@ -65,6 +102,8 @@ public void mostrarCeramicaDecorada() {
         e.printStackTrace();
     }
 }
+
+
 public void eliminarRegistroDetallada() {
     int filaSeleccionada = tbDetallada.getSelectedRow();
     Connection conn = null;

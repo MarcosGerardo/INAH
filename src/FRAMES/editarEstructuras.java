@@ -110,6 +110,7 @@ public class editarEstructuras extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+    
 
 
 
@@ -252,6 +253,10 @@ public class editarEstructuras extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 Actualizar();
+FramePrincipal pri=new FramePrincipal();
+pri.cargarEstructuraCombo();
+pri.cargarSitios();
+
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 

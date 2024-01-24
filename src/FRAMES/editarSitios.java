@@ -46,9 +46,7 @@ public class editarSitios extends javax.swing.JFrame {
         ComboBoxCar.setSelectedItem(carta);
     }
 
-    public void setTipo(String tipo) {
-        ComboBoxTip.setSelectedItem(tipo);
-    }
+ 
 
     public void Actualizar() {
         Connection conn = null;
@@ -56,17 +54,17 @@ public class editarSitios extends javax.swing.JFrame {
         PreparedStatement ps = null;
         try {
             conn = cn.getConexion();
-            String sql = "UPDATE sitios SET nombre = ?, descripcion = ?, referencia = ?, coordenadas = ?, CartaTopografica = ?, tipo = ? WHERE id = ?";
+            String sql = "UPDATE sitios SET nombre = ?, descripcion = ?, referencia = ?, coordenadas = ?, CartaTopografica = ? WHERE id = ?";
             String elementoSeleccionado = ComboBoxCar.getSelectedItem().toString();
-            String elementoSeleccionado1 = ComboBoxTip.getSelectedItem().toString();
+        
             ps = conn.prepareStatement(sql);
             ps.setString(1, txtNombre.getText());
             ps.setString(2, txtDescripcion.getText());
             ps.setString(3, txtReferencia.getText());
             ps.setString(4, txtCordenadas.getText());
             ps.setString(5, elementoSeleccionado);
-            ps.setString(6, elementoSeleccionado1);
-            ps.setString(7, idDelElementoSeleccionado);
+        
+            ps.setString(6, idDelElementoSeleccionado);
             int filasAfectadas = ps.executeUpdate();
             framePrincipal.mostrar("sitios"); 
             if (filasAfectadas > 0) {
@@ -104,7 +102,6 @@ public class editarSitios extends javax.swing.JFrame {
         txtReferencia = new javax.swing.JTextField();
         txtCordenadas = new javax.swing.JTextField();
         ComboBoxCar = new javax.swing.JComboBox<>();
-        ComboBoxTip = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -112,7 +109,6 @@ public class editarSitios extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(245, 225, 206));
@@ -122,8 +118,6 @@ public class editarSitios extends javax.swing.JFrame {
         txtDescripcion.setColumns(20);
         txtDescripcion.setRows(5);
         jScrollPane1.setViewportView(txtDescripcion);
-
-        ComboBoxTip.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         jButton1.setBackground(new java.awt.Color(245, 225, 206));
         jButton1.setForeground(new java.awt.Color(0, 0, 0));
@@ -165,10 +159,6 @@ public class editarSitios extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("CARTA");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI Black", 1, 12)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel6.setText("TIPO");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -193,12 +183,7 @@ public class editarSitios extends javax.swing.JFrame {
                                 .addComponent(jLabel5)))
                         .addGap(21, 21, 21)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(ComboBoxCar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(26, 26, 26)
-                                .addComponent(jLabel6)
-                                .addGap(18, 18, 18)
-                                .addComponent(ComboBoxTip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(ComboBoxCar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addGap(48, 48, 48)
@@ -208,7 +193,7 @@ public class editarSitios extends javax.swing.JFrame {
                                 .addComponent(txtReferencia, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtCordenadas)))))
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -232,9 +217,7 @@ public class editarSitios extends javax.swing.JFrame {
                 .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(ComboBoxCar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
-                    .addComponent(ComboBoxTip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(ComboBoxCar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(37, 37, 37)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
@@ -246,7 +229,7 @@ public class editarSitios extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,7 +286,6 @@ dispose();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox<String> ComboBoxCar;
-    public javax.swing.JComboBox<String> ComboBoxTip;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -311,7 +293,6 @@ dispose();
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JTextField txtCordenadas;
