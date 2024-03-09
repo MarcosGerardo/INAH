@@ -35,70 +35,12 @@ public class ceramicaMonocroma extends javax.swing.JFrame {
      */
     public ceramicaMonocroma() {
         initComponents();
-       mostrar();
+//       mostrar();
        this.setLocationRelativeTo(null);
     }
  
 
-public void mostrar() {
-    Connection conn = null;
-    String SQL = "SELECT * FROM ceramicamonocroma";
-    Statement st;
-    CONECTOR con = new CONECTOR();
-    conn = con.getConexion();
-    DefaultTableModel model = new DefaultTableModel();
 
-    // Agrega las columnas que deseas mostrar en la tabla
-    model.addColumn("id");
-    model.addColumn("Sitio");
-    model.addColumn("Numero_de_bolsa");
-    model.addColumn("Unidad");
-    model.addColumn("Estructura");
-    model.addColumn("Cuarto");
-    model.addColumn("E");
-    model.addColumn("N");
-    model.addColumn("RT");
-    model.addColumn("Estrato");
-    model.addColumn("Total");
-    model.addColumn("Rojo");
-    model.addColumn("Negro");
-    model.addColumn("Cafe");
-    model.addColumn("Burdo_liso");
-    model.addColumn("Impresion_una");
-    model.addColumn("Peinado");
-    model.addColumn("Texturizado");
-    model.addColumn("Con_tierra_batida");
-    model.addColumn("Otro");
-    model.addColumn("Plato");
-    model.addColumn("Cajete");
-    model.addColumn("Olla");
-    model.addColumn("Vaso");
-    model.addColumn("Jarra");
-    model.addColumn("Molcajete");
-    model.addColumn("No_id");
-    model.addColumn("Borde");
-    model.addColumn("Cuerpo");
-    model.addColumn("Asa");
-    model.addColumn("Soportes");
-    model.addColumn("Registro");
-    model.addColumn("Analizo");
-
-    tablaCeramicaMonocroma.setModel(model);
-    String[] datos = new String[33]; // Ajusta el tamaño al número de columnas en tu tabla
-
-    try {
-        st = conn.createStatement();
-        ResultSet rs = st.executeQuery(SQL);
-        while (rs.next()) {
-            for (int i = 1; i <= 33; i++) { // Ajusta el rango al número de columnas en tu tabla
-                datos[i - 1] = rs.getString(i);
-            }
-            model.addRow(datos);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
 
  public void eliminarRegistroMonocroma() {
     int filaSeleccionada = tablaCeramicaMonocroma.getSelectedRow();
@@ -186,14 +128,48 @@ public void mostrar() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton2 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaCeramicaMonocroma = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jButton2.setText("REGRESAR");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1126, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        jButton1.setText("ELIMINAR");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("DESCARGAR");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        tablaCeramicaMonocroma.setBackground(new java.awt.Color(255, 204, 153));
         tablaCeramicaMonocroma.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -207,55 +183,56 @@ public void mostrar() {
         ));
         jScrollPane1.setViewportView(tablaCeramicaMonocroma);
 
-        jButton1.setText("ELIMINAR");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        jButton2.setText("REGRESAR");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        jButton3.setText("DESCARGAR");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1114, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(30, 30, 30)
-                .addComponent(jButton3)
-                .addGap(30, 30, 30)
-                .addComponent(jButton2)
-                .addGap(29, 29, 29))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(519, 519, 519)
+                    .addComponent(jButton2)
+                    .addContainerGap(520, Short.MAX_VALUE)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(521, 521, 521)
+                    .addComponent(jButton1)
+                    .addContainerGap(522, Short.MAX_VALUE)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(514, 514, 514)
+                    .addComponent(jButton3)
+                    .addContainerGap(515, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(283, 283, 283)
                     .addComponent(jButton2)
-                    .addComponent(jButton3))
-                .addGap(26, 26, 26))
+                    .addContainerGap(290, Short.MAX_VALUE)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(283, 283, 283)
+                    .addComponent(jButton1)
+                    .addContainerGap(290, Short.MAX_VALUE)))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addGap(283, 283, 283)
+                    .addComponent(jButton3)
+                    .addContainerGap(290, Short.MAX_VALUE)))
         );
 
         pack();
@@ -268,7 +245,7 @@ this.setVisible(false);
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 eliminarRegistroMonocroma();
-        mostrar();
+        //mostrar();
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -319,6 +296,7 @@ eliminarRegistroMonocroma();
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tablaCeramicaMonocroma;
     // End of variables declaration//GEN-END:variables

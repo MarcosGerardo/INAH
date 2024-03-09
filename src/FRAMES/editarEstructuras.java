@@ -259,7 +259,7 @@ public class editarEstructuras extends javax.swing.JFrame {
 Actualizar();
 FramePrincipal pri=new FramePrincipal();
 pri.cargarEstructuraCombo();
-pri.cargarSitios();
+//pri.cargarSitios();
 
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
