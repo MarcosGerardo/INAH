@@ -28,9 +28,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class ceramicaDecorada extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ceramicaDecorada
-     */
+
     public ceramicaDecorada() {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -43,7 +41,7 @@ public void mostrarCeramicaDecorada() {
     conn = con.getConexion();
     DefaultTableModel model = new DefaultTableModel();
 
-    // Agrega las columnas que deseas mostrar en la tabla
+
     model.addColumn("id");
     model.addColumn("Sitio");
     model.addColumn("Bolsa");
@@ -87,13 +85,13 @@ public void mostrarCeramicaDecorada() {
     model.addColumn("Analizo");
 
     tbDetallada.setModel(model);
-    String[] datos = new String[40]; // Ajusta el tamaño al número de columnas en tu tabla
+    String[] datos = new String[40]; 
 
     try {
         st = conn.createStatement();
         ResultSet rs = st.executeQuery(SQL);
         while (rs.next()) {
-            for (int i = 1; i <= 40; i++) { // Ajusta el rango al número de columnas en tu tabla
+            for (int i = 1; i <= 40; i++) { 
                 datos[i - 1] = rs.getString(i);
             }
             model.addRow(datos);
@@ -194,7 +192,7 @@ public void eliminarRegistroDetallada() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(255, 204, 153));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 204));
 
         tbDetallada.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

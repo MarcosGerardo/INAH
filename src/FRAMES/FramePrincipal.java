@@ -64,104 +64,7 @@ public final class FramePrincipal extends javax.swing.JFrame {
         visor.setVisible(false);
         btnLimpiar.setToolTipText("Limpiar formulario");btnEditar.setToolTipText("Editar formulario");btnRegistrar.setToolTipText("Registrar formulario");btnEliminar.setToolTipText("Borrar formulario");
     }
-    //metodo para obtener el id foraneo
-public int obtenerIdSeleccionado(String nombreTabla, String columnaTexto, String columnaId, JComboBox<?> comboBox) {
-
-    String var = comboBox.getSelectedItem().toString();
     
-    // Inicializar la conexión y el PreparedStatement
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    
-    try {
-        // Establecer la conexión
-        CONECTOR cn = new CONECTOR();
-        conn = cn.getConexion();
-        
-        // Consulta SQL para obtener el ID correspondiente al texto seleccionado
-        String sql = "SELECT " + columnaId + " FROM " + nombreTabla + " WHERE " + columnaTexto + " = ?";
-        
-        // Preparar la consulta
-        ps = conn.prepareStatement(sql);
-        ps.setString(1, var);
-        
-        // Ejecutar la consulta
-        rs = ps.executeQuery();
-        
-        // Verificar si se encontró el ID y devolverlo
-        if (rs.next()) {
-            return rs.getInt(1);
-        } else {
-            // Manejar el caso donde no se encontró el ID correspondiente al texto seleccionado
-            return -1; // Otra indicación de que no se pudo obtener el ID
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        // Manejar la excepción adecuadamente según tus necesidades
-        return -1; // Otra indicación de que no se pudo obtener el ID
-    } finally {
-        // Cerrar los recursos
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            // Manejar errores de cierre si es necesario
-        }
-    }
-}
-
-
-public String obtenerNombreDesdeId(String nombreTabla, String columnaTexto, String columnaId, JComboBox<?> comboBox) {
-    // Obtener el ID seleccionado del JComboBox
-    int idSeleccionado = (int) comboBox.getSelectedItem(); // Supongo que el JComboBox está lleno de objetos de tipo Integer
-
-    // Inicializar la conexión y el PreparedStatement
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    try {
-        // Establecer la conexión
-        CONECTOR cn = new CONECTOR();
-        conn = cn.getConexion();
-
-        // Consulta SQL para obtener el nombre correspondiente al ID seleccionado
-        String sql = "SELECT " + columnaTexto + " FROM " + nombreTabla + " WHERE " + columnaId + " = ?";
-
-        // Preparar la consulta
-        ps = conn.prepareStatement(sql);
-        ps.setInt(1, idSeleccionado);
-
-        // Ejecutar la consulta
-        rs = ps.executeQuery();
-
-        // Verificar si se encontró el nombre y devolverlo
-        if (rs.next()) {
-            return rs.getString(1);
-        } else {
-            // Manejar el caso donde no se encontró el nombre correspondiente al ID seleccionado
-            return null; // Otra indicación de que no se pudo obtener el nombre
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        // Manejar la excepción adecuadamente según tus necesidades
-        return null; // Otra indicación de que no se pudo obtener el nombre
-    } finally {
-        // Cerrar los recursos
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            // Manejar errores de cierre si es necesario
-        }
-    }
-}
-
 public void registrarSitios() throws IllegalAccessException {
     Connection conn = null;
     CONECTOR cn = new CONECTOR();
@@ -172,20 +75,19 @@ public void registrarSitios() throws IllegalAccessException {
 
         
         String nombreSitio = txtNombreSitio.getText();
-          String tipoSitio = cbTipo.getSelectedItem().toString();
-        //int tipoSitio = obtenerIdSeleccionado("tipo","nombreTipo", "Id", cbTipo);
+        String tipoSitio = cbTipo.getSelectedItem().toString();
         String regionSitio = cbRegionesSitios.getSelectedItem().toString();
- ;
         String nombreProyecto = txtNombreProyecto.getText();
         String fechaRegistro = txtFecha.getText();
         String nombreRegistro = txtPersona.getText();
         String localidadSitio = txtLocalidad.getText();
-         String municipioSitio = cbMunicipio.getSelectedItem().toString();
+        String municipioSitio = cbMunicipio.getSelectedItem().toString();
         String esteSitio = txtEste.getText();
         String norteSitio = txtNorte.getText();
         String altitudSitio = txtAltitud.getText();
         String datumSitio = txtDatum.getText();
        String extensionEstimStr = txtExtension.getText();
+       
 int extensionEstim = 0; // Valor por defecto en caso de que el campo esté vacío
 
 if (!extensionEstimStr.isEmpty()) {
@@ -197,11 +99,10 @@ if (!extensionEstimStr.isEmpty()) {
         return; // Salir del método si no se puede convertir a un número
     }
 }
-          String topoForma = cbTopo.getSelectedItem().toString();
-   
+       String topoForma = cbTopo.getSelectedItem().toString();
        String cronologiaSitio = cbCronos.getSelectedItem().toString();
-        String  cartastopograficas = ComboBoxCarta.getSelectedItem().toString();
-        String descripcion = txtDescripcion.getText();
+       String  cartastopograficas = ComboBoxCarta.getSelectedItem().toString();
+       String descripcion = txtDescripcion.getText();
 
         // Validaciones de campos obligatorios
         if (nombreSitio.isEmpty() || nombreProyecto.isEmpty() || fechaRegistro.isEmpty() || nombreRegistro.isEmpty() || localidadSitio.isEmpty() || esteSitio.isEmpty() || norteSitio.isEmpty() || altitudSitio.isEmpty() || datumSitio.isEmpty() || descripcion.isEmpty()) {
@@ -209,7 +110,6 @@ if (!extensionEstimStr.isEmpty()) {
             return; // Salir del método si algún campo obligatorio está vacío
         }
 
-        // Consulta SQL para insertar datos en la tabla 'sitio'
         String sql = "INSERT INTO sitio (nombreSitio, tipoSitio, regionSitio, nombreProyecto, fechaRegistro, nombreRegistro, localidadSitio, municipioSitio, esteSitio, norteSitio, altitudSitio, datumSitio, extensionEstim, topoForma, cronologiaSitio, cartastopograficas, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         ps = conn.prepareStatement(sql);
@@ -273,7 +173,7 @@ if (!extensionEstimStr.isEmpty()) {
         String elemento_id = ComboBoxL1.getSelectedItem().toString();
        String formageneral = cbFrmaGral.getSelectedItem().toString();
         
-        // Consulta SQL para insertar datos en la tabla 'locus'
+   
         String sql = "INSERT INTO locus (nombreLocus, Ubicacion, Referencia, Color, Descripcion, elemento_id, formageneral) VALUES (?, ?, ?, ?, ?, ?,?)";
 
         ps = conn.prepareStatement(sql);
@@ -306,61 +206,14 @@ if (!extensionEstimStr.isEmpty()) {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            // Manejar errores de cierre si es necesario
+
         }
     }
 }
 
   
-    public String obtenerNombreSeleccionado(String nombreTabla, String columnaTexto, JComboBox<?> comboBox) {
-    // Obtener el texto seleccionado del JComboBox
-    String var = comboBox.getSelectedItem().toString();
-    
-    // Inicializar la conexión y el PreparedStatement
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    
-    try {
-        // Establecer la conexión
-        CONECTOR cn = new CONECTOR();
-        conn = cn.getConexion();
-        
-        // Consulta SQL para obtener el nombre correspondiente al texto seleccionado
-        String sql = "SELECT " + columnaTexto + " FROM " + nombreTabla + " WHERE " + columnaTexto + " = ?";
-        
-        // Preparar la consulta
-        ps = conn.prepareStatement(sql);
-        ps.setString(1, var);
-        
-        // Ejecutar la consulta
-        rs = ps.executeQuery();
-        
-        // Verificar si se encontró el nombre y devolverlo
-        if (rs.next()) {
-            return rs.getString(1);
-        } else {
-            // Manejar el caso donde no se encontró el nombre correspondiente al texto seleccionado
-            return null; 
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return null; // Indicación de que no se pudo obtener el nombre
-    } finally {
-        // Cerrar los recursos
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-           
-        }
-    }
-}
-
-
-    private void limpiarSitios() {
+//METODOS LIMPIAR
+  private void limpiarSitios() {
     txtNombreSitio.setText("");
     cbTipo.setSelectedIndex(0);
     cbRegionesSitios.setSelectedIndex(0);
@@ -379,7 +232,7 @@ if (!extensionEstimStr.isEmpty()) {
     ComboBoxCarta.setSelectedIndex(0);
     txtDescripcion.setText("");
 }
-
+//COMBOS DE ENTIDADES FUERTES
 
    void cargarComboSitios()  {
     Connection conn = null;
@@ -420,61 +273,6 @@ if (!extensionEstimStr.isEmpty()) {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-}
-
-public void cbCartasTopo(JComboBox comboBox) {
-    
-    Connection conn;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps;
-    ResultSet rs;
-    String sql= "SELECT nombre FROM cartastopograficas ";
-    try {
-        conn = cn.getConexion();
-        ps = conn.prepareStatement(sql);
-        rs = ps.executeQuery();
-        while (rs.next()) {      
-            comboBox.addItem(rs.getString("nombre"));
-        }
-    } catch (SQLException e) {
-       
-    }
-}
-public void cbCartas(JComboBox str){
-    Connection conn;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps;
-    java.sql.ResultSet rs;
-    String sql= "SELECT nombre FROM cartastopograficas ORDER BY nombre ASC";
-    try {
-        conn = cn.getConexion();
-        ps = conn.prepareStatement(sql);
-        rs = ps.executeQuery();
-        while (rs.next()) {      
-            str.addItem(rs.getString("nombre"));
-        }
-    } catch (SQLException e) {
-        System.err.println(e.toString());
-    }
-}
-
-
-public void cbUbi(JComboBox comboBox) {
-    Connection conn;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps;
-    ResultSet rs;
-    String sql= "SELECT nombre  FROM puntoscardinales ";
-    try {
-        conn = cn.getConexion();
-        ps = conn.prepareStatement(sql);
-        rs = ps.executeQuery();
-        while (rs.next()) {      
-            comboBox.addItem(rs.getString("nombre"));
-        }
-    } catch (SQLException e) {
-       
     }
 }
 public void cbInmueble() {
@@ -565,6 +363,64 @@ public void cbLocus() {
     }
 
 }
+//OTROS COMBOS
+
+public void cbCartasTopo(JComboBox comboBox) {
+    
+    Connection conn;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps;
+    ResultSet rs;
+    String sql= "SELECT nombre FROM cartastopograficas ";
+    try {
+        conn = cn.getConexion();
+        ps = conn.prepareStatement(sql);
+        rs = ps.executeQuery();
+        while (rs.next()) {      
+            comboBox.addItem(rs.getString("nombre"));
+        }
+    } catch (SQLException e) {
+       
+    }
+}
+public void cbCartas(JComboBox str){
+    Connection conn;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps;
+    java.sql.ResultSet rs;
+    String sql= "SELECT nombre FROM cartastopograficas ORDER BY nombre ASC";
+    try {
+        conn = cn.getConexion();
+        ps = conn.prepareStatement(sql);
+        rs = ps.executeQuery();
+        while (rs.next()) {      
+            str.addItem(rs.getString("nombre"));
+        }
+    } catch (SQLException e) {
+        System.err.println(e.toString());
+    }
+}
+
+
+public void cbUbi(JComboBox comboBox) {
+    Connection conn;
+    CONECTOR cn = new CONECTOR();
+    PreparedStatement ps;
+    ResultSet rs;
+    String sql= "SELECT nombre  FROM puntoscardinales ";
+    try {
+        conn = cn.getConexion();
+        ps = conn.prepareStatement(sql);
+        rs = ps.executeQuery();
+        while (rs.next()) {      
+            comboBox.addItem(rs.getString("nombre"));
+        }
+    } catch (SQLException e) {
+       
+    }
+}
+
+
 
 public void cbNaturaleza() {
     Connection conn = null;
@@ -637,14 +493,7 @@ public void cbForma() {
 
 
 
-public int obtenerClavePrimariaDelRegistro() {
-    int filaSeleccionada = visorLocus.getSelectedRow();
-    if (filaSeleccionada != -1) {
-        return Integer.parseInt(visorLocus.getValueAt(filaSeleccionada, 0).toString());
-    } else {
-        return -1;
-    }
-}
+//METODOS ELIMINAR
 
   public void eliminarRegistro() {
     int filaSeleccionada = visor.getSelectedRow();
@@ -658,7 +507,7 @@ public int obtenerClavePrimariaDelRegistro() {
         return; 
     }
 
-    // Obtiene el ID del registro a eliminar
+    
     String id = visor.getValueAt(filaSeleccionada, 0).toString();
     String sqlDelete = "DELETE FROM sitios WHERE id=?";
     
@@ -715,6 +564,41 @@ public int obtenerClavePrimariaDelRegistro() {
          
         
     }
+        public void mostrarEstructura( String Tabla){
+        Connection conn = null;
+         String SQL = "SELECT estructuras.*, sitios.nombre AS NombreSitio FROM estructuras JOIN sitios ON estructuras.sitio_id = sitios.id;";
+         Statement st;
+         CONECTOR con=new CONECTOR();
+        conn = con.getConexion();
+        DefaultTableModel model= new DefaultTableModel();
+         model.addColumn("ID");
+         model.addColumn("Nombre");
+         model.addColumn("Descripcion");
+         model.addColumn("Referencia");
+         model.addColumn("sitio_id");
+         model.addColumn("Sitio");
+      
+         visorEstructuras.setModel(model);
+         String [] datos =new String[6];
+         try {
+            st = conn.createStatement();
+            ResultSet rs = st.executeQuery(SQL);
+            while(rs.next()){
+                datos[0]=rs.getString(1);
+                datos[1]=rs.getString(2);
+                datos[2]=rs.getString(3);
+                datos[3]=rs.getString(4);
+                datos[4]=rs.getString(5);
+                 datos[5]=rs.getString(6);
+                model.addRow(datos);
+                
+            }
+        } catch (SQLException e) {
+             JOptionPane.showMessageDialog(null, "ERROR" );
+        }
+         
+        
+    }
     //METODOSElementoInmueble
   
    private void registrarElementoInmueble() {
@@ -736,19 +620,7 @@ public int obtenerClavePrimariaDelRegistro() {
         boolean elementoAisladoInt;
         int conjuntoElemeto;
 
-        if (elementoAislado) {
-            elementoAisladoInt = false; // Si es verdadero, asignamos falso
-            conjuntoElemeto = 0;
-        } else {
-            String conjuntoElementoStr = txtConjunto.getText();
-            if (!conjuntoElementoStr.matches("\\d+")) {
-                JOptionPane.showMessageDialog(null, "Por favor, ingrese un valor entero para el campo 'Conjunto Elemento'.", "Error", JOptionPane.ERROR_MESSAGE);
-                return; // Salir del método porque el valor de conjuntoElemento no es válido
-            }
-            elementoAisladoInt = true; // Si es falso, asignamos verdadero
-            conjuntoElemeto = Integer.parseInt(conjuntoElementoStr);
-        }
-
+   
         // Obtener el valor numérico
         String orientacionElemento = txtOri.getText();
         String Azimut = txtAzimut.getText();
@@ -760,6 +632,18 @@ public int obtenerClavePrimariaDelRegistro() {
                 && !extensionElemento.isEmpty() && !formaGeneral.isEmpty() && !orientacionElemento.isEmpty()
                 && !Azimut.isEmpty()) {
             String sql = "INSERT INTO ELEMENTOINMUEBLE (nombreElemento, nombreSitio, sectorElemento, extensionElemento, formaGeneral, elementoAislado, conjuntoElemeto, orientacionElemento, Azimut, naturalezaInmueble, tipoEvidencia, Descripcion, sitio_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM sitio WHERE nombreSitio = ?))";
+     if (elementoAislado) {
+            elementoAisladoInt = false; // Si es verdadero, asignamos falso
+            conjuntoElemeto = 0;
+        } else {
+            String conjuntoElementoStr = txtConjunto.getText();
+            if (!conjuntoElementoStr.matches("\\d+")) {
+                JOptionPane.showMessageDialog(null, "Por favor, ingrese un valor entero para el campo 'Conjunto Elemento'.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Salir del método porque el valor de conjuntoElemento no es válido
+            }
+            elementoAisladoInt = true; // Si es falso, asignamos verdadero
+            conjuntoElemeto = Integer.parseInt(conjuntoElementoStr);
+        }
 
             ps = conn.prepareStatement(sql);
             ps.setString(1, nombreElemento);
@@ -803,112 +687,6 @@ public int obtenerClavePrimariaDelRegistro() {
     }
 }
 
-
-
-  
-      public void mostrarEstructura( String Tabla){
-        Connection conn = null;
-         String SQL = "SELECT estructuras.*, sitios.nombre AS NombreSitio FROM estructuras JOIN sitios ON estructuras.sitio_id = sitios.id;";
-         Statement st;
-         CONECTOR con=new CONECTOR();
-        conn = con.getConexion();
-        DefaultTableModel model= new DefaultTableModel();
-         model.addColumn("ID");
-         model.addColumn("Nombre");
-         model.addColumn("Descripcion");
-         model.addColumn("Referencia");
-         model.addColumn("sitio_id");
-         model.addColumn("Sitio");
-      
-         visorEstructuras.setModel(model);
-         String [] datos =new String[6];
-         try {
-            st = conn.createStatement();
-            ResultSet rs = st.executeQuery(SQL);
-            while(rs.next()){
-                datos[0]=rs.getString(1);
-                datos[1]=rs.getString(2);
-                datos[2]=rs.getString(3);
-                datos[3]=rs.getString(4);
-                datos[4]=rs.getString(5);
-                 datos[5]=rs.getString(6);
-                model.addRow(datos);
-                
-            }
-        } catch (SQLException e) {
-             JOptionPane.showMessageDialog(null, "ERROR" );
-        }
-         
-        
-    }
-
-  
-
-private int obtenerClavePrimariaDelRegistro(int filaSeleccionada) {
-    try {
-        Object valorCelda = visorEstructuras.getValueAt(filaSeleccionada, 0);
-
-        if (valorCelda instanceof Integer) {
-            return (Integer) valorCelda;
-        } else if (valorCelda instanceof String) {
-            try {
-                return Integer.parseInt((String) valorCelda);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                throw new IllegalArgumentException("El valor en la celda no es una clave primaria válida.");
-            }
-        }
-    } catch (IndexOutOfBoundsException e) {
-        JOptionPane.showMessageDialog(null, "Error al obtener la clave primaria: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-        throw new IllegalArgumentException("No se pudo obtener la clave primaria.");
-    }
-
-    JOptionPane.showMessageDialog(null, "No se pudo obtener la clave primaria.", "Error", JOptionPane.ERROR_MESSAGE);
-    throw new IllegalArgumentException("No se pudo obtener la clave primaria.");
-}
-
-
-void cargarEstructuraCombo() {
-    Connection conn = null;
-    CONECTOR cn = new CONECTOR();
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    try {
-        conn = cn.getConexion();
-        String sql = "SELECT id, nombre FROM estructuras ";
-        ps = conn.prepareStatement(sql);
-        rs = ps.executeQuery();
-        ComboBoxL1.removeAllItems();
-        while (rs.next()) {
-            String nombreSitio = rs.getString("nombre");
-           // ComboBoxL1.addItem(nombreSitio);
-            cbEstructuraCM.addItem(nombreSitio);
-            cbEstructura1.addItem(nombreSitio);
-           cbEstructura3.addItem(nombreSitio);
-           cbEstructuraDC.addItem(nombreSitio);
-           cbEstructura2.addItem(nombreSitio);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error al cargar los sitios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
 
 
   
@@ -1020,7 +798,7 @@ void cargarEstructuraCombo() {
       }
              }
              
-                         public void cbEvi(JComboBox str){
+        public void cbEvi(JComboBox str){
        Connection conn;
        CONECTOR cn = new CONECTOR();
        PreparedStatement ps;
@@ -1061,28 +839,7 @@ void cargarEstructuraCombo() {
              } 
             
       
- 
-    public void AutocompleterTwo(JComboBox str){
-       Connection conn;
-       CONECTOR cn = new CONECTOR();
-       PreparedStatement ps;
-       ResultSet rs;
-          String sql= "SELECT Tipo FROM tipos ";
-          try {
-              conn = cn.getConexion();
-              ps = conn.prepareStatement(sql);
-              rs = ps.executeQuery();
-              while (rs.next()) {      
-                  str.addItem(rs.getString("Tipo"));
-                  
-              }
-          
-      } catch (SQLException e) {
-              System.err.println(e.toString());
-      }
- 
-    
-}
+
 
     
 private void registrarLiticatallada() {
@@ -2732,7 +2489,7 @@ private void limpiarCamposDecorada() {
                 btnRegistrarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 290, -1, -1));
+        jPanel3.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, -1, -1));
 
         btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
         btnEditar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -2750,7 +2507,7 @@ private void limpiarCamposDecorada() {
                 btnEditarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 330, -1, -1));
+        jPanel3.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 330, -1, -1));
 
         btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/edit-clear-broom-icon.png"))); // NOI18N
         btnLimpiar.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -2768,16 +2525,16 @@ private void limpiarCamposDecorada() {
                 btnLimpiarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 330, 60, 60));
+        jPanel3.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 330, 60, 60));
 
-        jLabel176.setText("LIMPIAR CAMPOS");
-        jPanel3.add(jLabel176, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 400, -1, -1));
+        jLabel176.setText("LIMPIAR");
+        jPanel3.add(jLabel176, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 400, -1, -1));
 
-        jLabel177.setText("ACEPTAR");
-        jPanel3.add(jLabel177, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 350, -1, -1));
+        jLabel177.setText("INSERTAR");
+        jPanel3.add(jLabel177, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 400, -1, -1));
 
         jLabel178.setText("MOSTRAR REGISTROS");
-        jPanel3.add(jLabel178, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 400, -1, -1));
+        jPanel3.add(jLabel178, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 400, -1, -1));
         jPanel3.add(jLabel179, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 410, -1, -1));
 
         jLabel13.setText("Tipo de Sitio: ");
@@ -3035,7 +2792,7 @@ private void limpiarCamposDecorada() {
                 btnLimpiarLocusActionPerformed(evt);
             }
         });
-        jPanel5.add(btnLimpiarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 60, 60));
+        jPanel5.add(btnLimpiarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 260, 60, 60));
         jPanel5.add(txtReferenciaL, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 190, 210, -1));
 
         btnEditarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/EDIT.png"))); // NOI18N
@@ -3054,7 +2811,7 @@ private void limpiarCamposDecorada() {
                 btnEditarLocusActionPerformed(evt);
             }
         });
-        jPanel5.add(btnEditarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 270, -1, -1));
+        jPanel5.add(btnEditarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 260, -1, -1));
 
         btnRegistrarLocus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ICONS/REGISTER.png"))); // NOI18N
         btnRegistrarLocus.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -3072,7 +2829,7 @@ private void limpiarCamposDecorada() {
                 btnRegistrarLocusActionPerformed(evt);
             }
         });
-        jPanel5.add(btnRegistrarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 270, -1, -1));
+        jPanel5.add(btnRegistrarLocus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, -1, -1));
 
         txtDescripcionL.setColumns(20);
         txtDescripcionL.setRows(5);
@@ -3108,13 +2865,13 @@ private void limpiarCamposDecorada() {
         jPanel5.add(txtColorL, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, 230, -1));
 
         jLabel180.setText("LIMPIAR");
-        jPanel5.add(jLabel180, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 350, -1, -1));
+        jPanel5.add(jLabel180, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 340, -1, -1));
 
         jLabel181.setText("INSERTAR");
-        jPanel5.add(jLabel181, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 350, -1, -1));
+        jPanel5.add(jLabel181, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 340, -1, -1));
 
         jLabel182.setText("MOSTRAR REGISTROS");
-        jPanel5.add(jLabel182, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 350, -1, -1));
+        jPanel5.add(jLabel182, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 340, -1, -1));
 
         jPanel5.add(cbUbicacionL, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 100, 150, -1));
 
@@ -4224,7 +3981,7 @@ private void limpiarCamposDecorada() {
                             .addGroup(jPanel17Layout.createSequentialGroup()
                                 .addGap(21, 21, 21)
                                 .addGroup(jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtRef)
+                                    .addComponent(txtRef, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
                                     .addComponent(txtLol)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel17Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -4568,7 +4325,7 @@ private void limpiarCamposDecorada() {
                             .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton16)))
                     .addComponent(jLabel42))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
         PanelCeramicaDetalladaLayout.setVerticalGroup(
             PanelCeramicaDetalladaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -5382,7 +5139,7 @@ private void limpiarCamposDecorada() {
                                             .addComponent(jButton22))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jButton21)))
-                                .addGap(0, 11, Short.MAX_VALUE))))))
+                                .addGap(0, 10, Short.MAX_VALUE))))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelLiticaPuLayout.createSequentialGroup()
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -5661,10 +5418,9 @@ loco.setVisible(true);
 
     private void btnRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrar1ActionPerformed
         registrarElementoInmueble();
-        //mostrarEstructura("estructuras");
-        //cargarEstructuraCombo();
-        
-
+        cbLocus();
+        cbInmueble();
+        cargarComboSitios();
 
     }//GEN-LAST:event_btnRegistrar1ActionPerformed
 
@@ -5757,6 +5513,10 @@ loco.setVisible(true);
       
      try {
          registrarSitios();
+          cbLocus();
+        cbInmueble();
+        cargarComboSitios();
+
      } catch (IllegalAccessException ex) {
          Logger.getLogger(FramePrincipal.class.getName()).log(Level.SEVERE, null, ex);
      }
@@ -5822,7 +5582,8 @@ cer.setVisible(true);
     }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
-       liticaTallada li = new liticaTallada();
+       dispose();
+        liticaTallada li = new liticaTallada();
         li.mostrarLiticatallada();
         li.setVisible(true);
 
@@ -5833,9 +5594,12 @@ cer.setVisible(true);
     }//GEN-LAST:event_jButton20ActionPerformed
 
     private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
-   liticapulida pu=new liticapulida();
+dispose();
+ liticapulida pu=new liticapulida();
 pu.mostrarLiticapulida();
 pu.setVisible(true);
+
+
     }//GEN-LAST:event_jButton21ActionPerformed
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
@@ -5843,7 +5607,8 @@ pu.setVisible(true);
     }//GEN-LAST:event_jButton22ActionPerformed
 
     private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
-OTROS otro = new OTROS();
+        dispose();
+        OTROS otro = new OTROS();
 otro.mostrar();
 otro.setVisible(true);      
               
